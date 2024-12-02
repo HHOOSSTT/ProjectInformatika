@@ -39,13 +39,73 @@ public abstract class Display{
     public static void clear(){
         Arrays.fill(bufferData,clearColor);
     }
-    public static void render(){
-        bufferGraphics.setColor(new Color(0xff0000ff));
-        bufferGraphics.fillOval(400,250,100,100);
+    public static void paintComponent3(){
+        bufferGraphics.setColor(new Color(0x808080));
+        bufferGraphics.fillRect(100,75,725,25);
+        bufferGraphics.fillRect(100,100,25,450);
+        bufferGraphics.fillRect(100,550,725,25);
+        bufferGraphics.fillRect(800,100,25,450);
+        ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+    }
+    public static void paintComponent1(){
+        bufferGraphics.setColor(new Color(0xD3D3D3));
+        bufferGraphics.fillRect(125,100,675,450);
+        ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+    }
+    public static void paintComponent2(){
+        bufferGraphics.setColor(new Color(0x654321));
+        int a=150;
+        int i=1;
+        while(a<=750){
+            if((i==8)||(i==6)||(i==7)){
+                bufferGraphics.fillRect(a,125,25,25);
+                bufferGraphics.fillRect(a,150,25,25);
+                bufferGraphics.fillRect(a,175,25,25);
+                a+=50;
+            }else{
+                bufferGraphics.fillRect(a,125,25,25);
+                bufferGraphics.fillRect(a,150,25,25);
+                a+=50;
+            }
+            i++;
+        }
+        int b=200;
+        while(b<=750){
+            bufferGraphics.fillRect(b,250,25,25);
+            bufferGraphics.fillRect(b+25,250,25,25);
+            bufferGraphics.fillRect(b+50,250,25,25);
+            bufferGraphics.fillRect(b+75,250,25,25);
+            bufferGraphics.fillRect(b+100,250,25,25);
+            b+=200;
+        }
+        bufferGraphics.fillRect(400,325,25,25);
+        bufferGraphics.fillRect(375,325,25,25);
+        bufferGraphics.fillRect(400,350,25,25);
+        bufferGraphics.fillRect(375,350,25,25);
+        bufferGraphics.fillRect(400,375,25,25);
+        bufferGraphics.fillRect(375,375,25,25);
+        bufferGraphics.fillRect(425,350,25,25);
+        bufferGraphics.fillRect(450,350,25,25);
+        bufferGraphics.fillRect(475,350,25,25);
+        bufferGraphics.fillRect(525,325,25,25);
+        bufferGraphics.fillRect(500,325,25,25);
+        bufferGraphics.fillRect(500,350,25,25);
+        bufferGraphics.fillRect(525,350,25,25);
+        bufferGraphics.fillRect(500,375,25,25);
+        bufferGraphics.fillRect(525,375,25,25);
+        int c=150;
+        while(c<=750){
+            bufferGraphics.fillRect(c,450,25,25);
+            bufferGraphics.fillRect(c,475,25,25);
+            bufferGraphics.fillRect(c,500,25,25);
+            c+=50;
+        }
+        bufferGraphics.fillRect(175,300,150,75);
+        bufferGraphics.fillRect(600,300,150,75);
         ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
     }
     public static void swapBuffers(){
-        Graphics g= bufferStrategy.getDrawGraphics();
+        Graphics g=bufferStrategy.getDrawGraphics();
         g.drawImage(buffer,0,0,null);
         bufferStrategy.show();
     }
