@@ -1,11 +1,14 @@
 package Tanks.display;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
-public abstract class Display{
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+public abstract class Display implements KeyListener{
     private static boolean created=false;
     private static JFrame window;
     private static Canvas content;
@@ -50,6 +53,18 @@ public abstract class Display{
     public static void paintComponent1(){
         bufferGraphics.setColor(new Color(0xD3D3D3));
         bufferGraphics.fillRect(125,100,675,450);
+        ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+    }
+    public static void paintComponent4(){
+        bufferGraphics.setColor(new Color(0x808080));
+        for(int i=125;i<550;i+=25){
+            bufferGraphics.drawLine(125,i,800,i);
+            ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        }
+        for(int j=150;j<800;j+=25){
+            bufferGraphics.drawLine(j,100,j,550);
+            ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        }
         ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
     }
     public static void paintComponent2(){
@@ -103,6 +118,32 @@ public abstract class Display{
         bufferGraphics.fillRect(175,300,150,75);
         bufferGraphics.fillRect(600,300,150,75);
         ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+    }
+    public static void paintComponent5(){
+        bufferGraphics.setColor(new Color(0x000000));
+        bufferGraphics.fillRect(775,525,25,25);
+        ((Graphics2D)bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+    }
+    static int tankx=775;
+    static int tanky=525;
+    static int lifes=3;
+    static boolean game=true;
+    public void movement(){
+
+    }
+    public static void KeyPressed(KeyEvent f){
+        if((f.getKeyCode()==KeyEvent.VK_UP)&&(game)){
+             tanky-=25;
+        }
+        if((f.getKeyCode()==KeyEvent.VK_LEFT)&&(game)){
+            tankx-=25;
+        }
+        if((f.getKeyCode()==KeyEvent.VK_DOWN)&&(game)){
+            tanky+=25;
+        }
+        if((f.getKeyCode()==KeyEvent.VK_RIGHT)&&(game)){
+            tankx+=25;
+        }
     }
     public static void swapBuffers(){
         Graphics g=bufferStrategy.getDrawGraphics();

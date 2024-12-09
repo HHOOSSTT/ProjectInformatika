@@ -1,6 +1,7 @@
 package Tanks.main;
 import Tanks.display.Display;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import javax.swing.Timer;
 import javax.swing.AbstractAction;
 public class Main{
@@ -10,8 +11,10 @@ public class Main{
             public void actionPerformed(ActionEvent e){
                 Display.clear();
                 Display.paintComponent1();
+                Display.paintComponent4();
                 Display.paintComponent2();
                 Display.paintComponent3();
+                Display.paintComponent5();
                 Display.swapBuffers();
             }
         });
@@ -19,3 +22,4 @@ public class Main{
         t.start();
     }
 }
+
