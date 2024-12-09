@@ -132,16 +132,16 @@ public abstract class Display implements KeyListener{
 
     }
     public static void KeyPressed(KeyEvent f){
-        if((f.getKeyCode()==KeyEvent.VK_UP)&&(game)){
+        if((f.getKeyCode()==KeyEvent.VK_W)&&(game)){
              tanky-=25;
         }
-        if((f.getKeyCode()==KeyEvent.VK_LEFT)&&(game)){
+        if((f.getKeyCode()==KeyEvent.VK_A)&&(game)){
             tankx-=25;
         }
-        if((f.getKeyCode()==KeyEvent.VK_DOWN)&&(game)){
+        if((f.getKeyCode()==KeyEvent.VK_S)&&(game)){
             tanky+=25;
         }
-        if((f.getKeyCode()==KeyEvent.VK_RIGHT)&&(game)){
+        if((f.getKeyCode()==KeyEvent.VK_D)&&(game)){
             tankx+=25;
         }
     }
