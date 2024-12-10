@@ -1,7 +1,6 @@
 package Tanks.main;
 import Tanks.display.Display;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import javax.swing.Timer;
 import javax.swing.AbstractAction;
 public class Main{
