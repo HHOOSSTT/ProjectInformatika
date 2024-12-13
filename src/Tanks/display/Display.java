@@ -1,7 +1,6 @@
 package Tanks.display;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
@@ -81,47 +80,26 @@ public abstract class Display {
         int a = 150;
         int i = 1;
         while (a <= 750) {
-            if ((i == 8) || (i == 6) || (i == 7)) {
-                bufferGraphics.fillRect(a, 125, 25, 25);
-                bufferGraphics.fillRect(a, 150, 25, 25);
-                bufferGraphics.fillRect(a, 175, 25, 25);
+            if ((i == 6) || (i == 7) || (i == 8)) {
+                bufferGraphics.fillRect(a, 125, 25, 75);
                 a += 50;
             } else {
-                bufferGraphics.fillRect(a, 125, 25, 25);
-                bufferGraphics.fillRect(a, 150, 25, 25);
+                bufferGraphics.fillRect(a, 125, 25, 50);
                 a += 50;
             }
             i++;
         }
         int b = 200;
         while (b <= 750) {
-            bufferGraphics.fillRect(b, 250, 25, 25);
-            bufferGraphics.fillRect(b + 25, 250, 25, 25);
-            bufferGraphics.fillRect(b + 50, 250, 25, 25);
-            bufferGraphics.fillRect(b + 75, 250, 25, 25);
-            bufferGraphics.fillRect(b + 100, 250, 25, 25);
+            bufferGraphics.fillRect(b, 250, 125, 25);
             b += 200;
         }
-        bufferGraphics.fillRect(400, 325, 25, 25);
-        bufferGraphics.fillRect(375, 325, 25, 25);
-        bufferGraphics.fillRect(400, 350, 25, 25);
-        bufferGraphics.fillRect(375, 350, 25, 25);
-        bufferGraphics.fillRect(400, 375, 25, 25);
-        bufferGraphics.fillRect(375, 375, 25, 25);
-        bufferGraphics.fillRect(425, 350, 25, 25);
-        bufferGraphics.fillRect(450, 350, 25, 25);
-        bufferGraphics.fillRect(475, 350, 25, 25);
-        bufferGraphics.fillRect(525, 325, 25, 25);
-        bufferGraphics.fillRect(500, 325, 25, 25);
-        bufferGraphics.fillRect(500, 350, 25, 25);
-        bufferGraphics.fillRect(525, 350, 25, 25);
-        bufferGraphics.fillRect(500, 375, 25, 25);
-        bufferGraphics.fillRect(525, 375, 25, 25);
+        bufferGraphics.fillRect(375, 325, 50, 75);
+        bufferGraphics.fillRect(425, 350, 75, 25);
+        bufferGraphics.fillRect(500, 325, 50, 75);
         int c = 150;
         while (c <= 750) {
-            bufferGraphics.fillRect(c, 450, 25, 25);
-            bufferGraphics.fillRect(c, 475, 25, 25);
-            bufferGraphics.fillRect(c, 500, 25, 25);
+            bufferGraphics.fillRect(c, 450, 25, 75);
             c += 50;
         }
         bufferGraphics.fillRect(175, 300, 150, 75);
@@ -139,11 +117,6 @@ public abstract class Display {
 
     private static int lifes = 3;
 
-    public void movement() {
-
-
-    }
-
     public static boolean game = true;
     static class MyKeyListener implements KeyListener {
         @Override
@@ -154,7 +127,7 @@ public abstract class Display {
         public void keyPressed(KeyEvent e) {
             int f = e.getKeyCode();
             if((f == KeyEvent.VK_W) && (game)) {
-                if(((tankx==775)||(tankx==125)||(tankx==325)||(tankx==575))&&(tanky>=125)){
+                if((((tankx==775)||(tankx==125)||(tankx==325)||(tankx==575))&&(tanky>=125))||(((tankx==150)||(tankx==350)||(tankx==550)||(tankx==750))&&((tanky>175)&&(tanky<=425)))||(((tankx==175)||(tankx==725))&&(((tanky<=525)&&(tanky>=400))||((tanky>=125)&&(tanky<=275))))||(((tankx==200)||(tankx==250)||(tankx==300)||(tankx==600)||(tankx==650)||(tankx==700))&&(((tanky>=200)&&(tanky<=225))||((tanky<=475)&&(tanky>=400))))||((tankx==225)&&(((tanky>=125)&&(tanky<=225))||((tanky<=525)&&(tanky>=400))))||(((tankx==375)||(tankx==525))&&(((tanky<=525)&&(tanky>=425))||((tanky>=125)&&(tanky<=300))))||(((tankx==400)||(tankx==500))&&((tanky==225)||(tanky==300)||(tanky==425)))||(((tankx==425)||(tankx==475))&&((tanky!=250)&&(tanky!=275)&&(tanky!=350)&&(tanky!=375)&&(tanky>=125)))||((tankx==450)&&((tanky==425)||(tanky==400)||(tanky==325)||(tanky==300)||(tanky==225)))){
                     tanky -= 25;
                     bufferGraphics.setColor(new Color(0x000000));
                     bufferGraphics.fillRect(tankx, tanky, 25, 25);
