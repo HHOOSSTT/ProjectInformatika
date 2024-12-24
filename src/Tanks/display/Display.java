@@ -1,4 +1,5 @@
 package Tanks.display;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -6,8 +7,12 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 public abstract class Display {
+
+    private static Image imageTank;
 
     private static boolean created = false;
     private static JFrame window;
@@ -18,7 +23,10 @@ public abstract class Display {
     private static int clearColor;
     private static BufferStrategy bufferStrategy;
 
-    public static void create(int length, int width, String title, int _clearColor, int numBuffers) {
+    public static void create(int length, int width, String title, int _clearColor, int numBuffers) throws IOException {
+        imageTank =   ImageIO.read(new File("tank.png"));
+
+
         if (created) {
             return;
         }
@@ -110,8 +118,9 @@ public abstract class Display {
     public static int tankx = 775;
     public static int tanky = 525;
     public static void paintComponent5() {
-        bufferGraphics.setColor(new Color(0x000000));
-        bufferGraphics.fillRect(tankx, tanky, 25, 25);
+        //bufferGraphics.setColor(new Color(0x000000));
+        //bufferGraphics.fillRect(tankx, tanky, 25, 25);
+        bufferGraphics.drawImage(imageTank, tankx, tanky, 25, 25,  null);
         ((Graphics2D) bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
@@ -127,7 +136,7 @@ public abstract class Display {
         public void keyPressed(KeyEvent e) {
             int f = e.getKeyCode();
             if((f == KeyEvent.VK_W) && (game)) {
-                if(((((tankx==775)||(tankx==125)||(tankx==325)||(tankx==575))&&((tanky>=125)&&(tanky<=525))||(((tankx==150)||(tankx==350)||(tankx==550)||(tankx==750))&&((tanky>175)&&(tanky<=425)))||(((tankx==175)||(tankx==725))&&(((tanky<=525)&&(tanky>=400))||((tanky>=125)&&(tanky<=275))))||(((tankx==200)||(tankx==250)||(tankx==300)||(tankx==600)||(tankx==650)||(tankx==700))&&(((tanky>=200)&&(tanky<=225))||((tanky<=475)&&(tanky>=400))))||((tankx==225)&&(((tanky>=125)&&(tanky<=225))||((tanky<=525)&&(tanky>=400))))||(((tankx==375)||(tankx==525))&&(((tanky<=525)&&(tanky>=425))||((tanky>=125)&&(tanky<=300))))||(((tankx==400)||(tankx==500))&&((tanky==225)||(tanky==300)||(tanky==425)))||(((tankx==425)||(tankx==475))&&((tanky!=250)&&(tanky!=275)&&(tanky!=350)&&(tanky!=375)&&(tanky>=125)))||((tankx==450)&&((tanky==425)||(tanky==400)||(tanky==325)||(tanky==300)||(tanky==225)))))) {
+                if(((((tankx==775)||(tankx==125)||(tankx==325)||(tankx==575))&&((tanky>=125)&&(tanky<=525))||(((tankx==150)||(tankx==350)||(tankx==550)||(tankx==750))&&((tanky>175)&&(tanky<=425)))||(((tankx==175)||(tankx==725))&&(((tanky<=525)&&(tanky>=400))||((tanky>=125)&&(tanky<=275))))||(((tankx==200)||(tankx==250)||(tankx==300)||(tankx==600)||(tankx==650)||(tankx==700))&&(((tanky>=200)&&(tanky<=225))||((tanky<=475)&&(tanky>=400))))||(((tankx==225)||(tankx==275)||(tankx==625)||(tankx==675))&&(((tanky>=125)&&(tanky<=225))||((tanky<=525)&&(tanky>=400))))||(((tankx==375)||(tankx==525))&&(((tanky<=525)&&(tanky>=425))||((tanky>=125)&&(tanky<=300))))||(((tankx==400)||(tankx==500))&&((tanky==225)||(tanky==300)||(tanky==425)))||(((tankx==425)||(tankx==475))&&((tanky!=250)&&(tanky!=275)&&(tanky!=350)&&(tanky!=375)&&(tanky>=125)))||((tankx==450)&&((tanky==425)||(tanky==400)||(tanky==325)||(tanky==300)||(tanky==225)))))) {
                     tanky -= 25;
                     bufferGraphics.setColor(new Color(0x000000));
                     bufferGraphics.fillRect(tankx, tanky, 25, 25);
