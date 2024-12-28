@@ -17,6 +17,7 @@ public abstract class Display {
     private static Image imageTankLEFT;
     private static Image imageTankRIGHT;
     public static Image imageTankNOW;
+    private static Image imageStenka;
 
     private static boolean created = false;
     private static JFrame window;
@@ -33,6 +34,7 @@ public abstract class Display {
         imageTankLEFT = ImageIO.read(new File("C:\\Users\\User\\Documents\\ProjectInformatika\\tankLEFT.png"));
         imageTankRIGHT = ImageIO.read(new File("C:\\Users\\User\\Documents\\ProjectInformatika\\tankRIGHT.png"));
         imageTankNOW = imageTankUP;
+        imageStenka = ImageIO.read(new File("C:\\Users\\User\\Documents\\ProjectInformatika\\stenka.png"));
 
         if (created) {
             return;
@@ -96,29 +98,29 @@ public abstract class Display {
         int i = 1;
         while (a <= 750) {
             if ((i == 6) || (i == 7) || (i == 8)) {
-                bufferGraphics.fillRect(a, 125, 25, 75);
+                bufferGraphics.drawImage(imageStenka, a, 125, 25, 75,  null);
                 a += 50;
             } else {
-                bufferGraphics.fillRect(a, 125, 25, 50);
+                bufferGraphics.drawImage(imageStenka, a, 125, 25, 50,  null);
                 a += 50;
             }
             i++;
         }
         int b = 200;
         while (b <= 750) {
-            bufferGraphics.fillRect(b, 250, 125, 25);
+            bufferGraphics.drawImage(imageStenka, b, 250, 125, 25,  null);
             b += 200;
         }
-        bufferGraphics.fillRect(375, 325, 50, 75);
-        bufferGraphics.fillRect(425, 350, 75, 25);
-        bufferGraphics.fillRect(500, 325, 50, 75);
+        bufferGraphics.drawImage(imageStenka, 375, 325, 50, 75,  null);
+        bufferGraphics.drawImage(imageStenka, 425, 350, 75, 25,  null);
+        bufferGraphics.drawImage(imageStenka, 500, 325, 50, 75,  null);
         int c = 150;
         while (c <= 750) {
-            bufferGraphics.fillRect(c, 450, 25, 75);
+            bufferGraphics.drawImage(imageStenka, c, 450, 25, 75,  null);
             c += 50;
         }
-        bufferGraphics.fillRect(175, 300, 150, 75);
-        bufferGraphics.fillRect(600, 300, 150, 75);
+        bufferGraphics.drawImage(imageStenka, 175, 300, 150, 75,  null);
+        bufferGraphics.drawImage(imageStenka, 600, 300, 150, 75,  null);
         ((Graphics2D) bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
