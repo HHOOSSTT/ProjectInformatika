@@ -18,6 +18,7 @@ public abstract class Display {
     private static Image imageTankRIGHT;
     public static Image imageTankNOW;
     private static Image imageStenka;
+    private static Image imageStenkavokrug;
 
     private static boolean created = false;
     private static JFrame window;
@@ -35,6 +36,7 @@ public abstract class Display {
         imageTankRIGHT = ImageIO.read(new File("C:\\Users\\User\\Documents\\ProjectInformatika\\tankRIGHT.png"));
         imageTankNOW = imageTankUP;
         imageStenka = ImageIO.read(new File("C:\\Users\\User\\Documents\\ProjectInformatika\\stenka.png"));
+        imageStenkavokrug = ImageIO.read(new File("C:\\Users\\User\\Documents\\ProjectInformatika\\stenkavokrug'.png"));
 
         if (created) {
             return;
@@ -65,11 +67,56 @@ public abstract class Display {
     }
 
     public static void paintComponent3() {
-        bufferGraphics.setColor(new Color(0x808080));
-        bufferGraphics.fillRect(100, 75, 725, 25);
-        bufferGraphics.fillRect(100, 100, 25, 450);
-        bufferGraphics.fillRect(100, 550, 725, 25);
-        bufferGraphics.fillRect(800, 100, 25, 450);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 150, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 200, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 250, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 300, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 350, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 400, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 450, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 500, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 550, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 600, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 650, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 700, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 750, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 75, 25, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 75, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 100, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 150, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 200, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 250, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 300, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 350, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 400, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 450, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 500, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 150, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 200, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 250, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 300, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 350, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 400, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 450, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 500, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 550, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 600, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 650, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 700, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 750, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 550, 25, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 100, 550, 50, 25,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 100, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 150, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 200, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 250, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 300, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 350, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 400, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 450, 25, 50,  null);
+        bufferGraphics.drawImage(imageStenkavokrug, 800, 500, 25, 50,  null);
         ((Graphics2D) bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
@@ -93,7 +140,6 @@ public abstract class Display {
     }
 
     public static void paintComponent2() {
-        bufferGraphics.setColor(new Color(0x654321));
         int a = 150;
         int i = 1;
         while (a <= 750) {
