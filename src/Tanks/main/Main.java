@@ -6,7 +6,7 @@ import javax.swing.Timer;
 import javax.swing.AbstractAction;
 public class Main{
     public static void main(String[] args) throws IOException {
-        Display.create(900,700,"Tanks",0xffffffff,3);
+        Display.create(900,700,"Tanks",0xffffffff,4);
         Timer t=new Timer(1000 / 60, new AbstractAction(){
             public void actionPerformed(ActionEvent e){
                 Display.clear();
@@ -16,6 +16,7 @@ public class Main{
                 Display.paintComponent3();
                 Display.paintComponent5();
                 Display.swapBuffers();
+                Display.isGame();
             }
         });
         t.setRepeats(true);
