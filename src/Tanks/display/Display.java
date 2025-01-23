@@ -53,9 +53,7 @@ public abstract class Display {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null);
         MyKeyListener myKeyListener = new MyKeyListener();
-        BulletSimulation simulation = new BulletSimulation();
         window.addKeyListener(myKeyListener);
-        window.add(simulation);
         buffer = new BufferedImage(length, width, BufferedImage.TYPE_INT_ARGB);
         bufferData = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
         bufferGraphics = buffer.getGraphics();
@@ -175,9 +173,13 @@ public abstract class Display {
 
     public static int tankx = 775;
     public static int tanky = 525;
+    public static int bulletX = tankx+8;
+    public static int bulletY = tanky-5;
 
     public static void paintComponent5() {
         bufferGraphics.drawImage(imageTankNOW, tankx, tanky, 25, 25, null);
+        bufferGraphics.setColor(Color.red);
+        bufferGraphics.fillOval(bulletX, bulletY, 10, 10);
         ((Graphics2D) bufferGraphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
@@ -191,6 +193,8 @@ public abstract class Display {
     }
 
     public static String direction = "UP";
+    public static boolean bulletVisible = false;
+    private Timer timer;
 
     static class MyKeyListener implements KeyListener {
         @Override
@@ -237,6 +241,36 @@ public abstract class Display {
                     direction = "DOWN";
                 }
             }
+            if ((f == KeyEvent.VK_SPACE) &&(game)) {
+                if(direction.equals("UP")){
+                    bulletX=tankx+8;
+                    bulletY=tanky-5;
+                    bulletVisible=true;
+                    bufferGraphics.setColor(Color.red);
+                    bufferGraphics.fillOval(bulletX, bulletY, 10, 10);
+                }
+                if(direction.equals("DOWN")){
+                    bulletX=tankx+8;
+                    bulletY=tanky+30;
+                    bulletVisible=true;
+                    bufferGraphics.setColor(Color.red);
+                    bufferGraphics.fillOval(bulletX, bulletY, 10, 10);
+                }
+                if(direction.equals("LEFT")){
+                    bulletX=tankx-5;
+                    bulletY=tanky+8;
+                    bulletVisible=true;
+                    bufferGraphics.setColor(Color.red);
+                    bufferGraphics.fillOval(bulletX, bulletY, 10, 10);
+                }
+                if(direction.equals("RIGHT")){
+                    bulletX=tankx+30;
+                    bulletY=tanky+8;
+                    bulletVisible=true;
+                    bufferGraphics.setColor(Color.red);
+                    bufferGraphics.fillOval(bulletX, bulletY, 10, 10);
+                }
+            }
         }
 
         @Override
@@ -244,82 +278,7 @@ public abstract class Display {
 
         }
     }
-    public static class BulletSimulation extends JPanel implements ActionListener {
-        public int bulletX = 0;
-        public int bulletY = 0;
-        private boolean bulletVisible = false;
-        private Timer timer;
 
-        public BulletSimulation() {
-            timer = new Timer(20, this);
-            timer.start();
-            addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                        bulletVisible = true;
-                        if(direction.equals("UP")){
-                            bulletX=tankx+8;
-                            bulletY=tanky-4;
-                        }
-                        if(direction.equals("DOWN")){
-                            bulletX=tankx+8;
-                            bulletY=tanky+29;
-                        }
-                        if(direction.equals("LEFT")){
-                            bulletX=tankx-4;
-                            bulletY=tanky+8;
-                        }
-                        if(direction.equals("RIGHT")){
-                            bulletX=tankx+29;
-                            bulletY=tanky+8;
-                        }
-                    }
-                }
-            });
-            setFocusable(true);
-        }
-
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            g.setColor(Color.RED);
-            if (bulletVisible) {
-                g.fillOval(bulletX, bulletY, 10, 10);
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (bulletVisible) {
-                if(direction.equals("LEFT")){
-                    bulletX -= 5;
-                    if (bulletX <= 0) {
-                        bulletVisible = false;
-                    }
-                }
-                if(direction.equals("UP")){
-                    bulletY -=5;
-                    if(bulletY <= 0){
-                        bulletVisible = false;
-                    }
-                }
-                if(direction.equals("RIGHT")){
-                    bulletY +=5;
-                    if(bulletY >= 550){
-                        bulletVisible = false;
-                    }
-                }
-                if(direction.equals("DOWN")){
-                    bulletY +=5;
-                    if(bulletY >= 775){
-                        bulletVisible = false;
-                    }
-                }
-            }
-            repaint();
-        }
-    }
     public static void swapBuffers() {
         Graphics g = bufferStrategy.getDrawGraphics();
         g.drawImage(buffer, 0, 0, null);
