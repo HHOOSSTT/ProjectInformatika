@@ -1,26 +1,23 @@
 package Tanks.main;
-import Tanks.display.Display;
-import java.awt.event.ActionEvent;
+import Tanks.display.Map;
+import Tanks.display.Tank;
+
+import java.awt.*;
 import java.io.IOException;
-import javax.swing.Timer;
-import javax.swing.AbstractAction;
+import javax.swing.*;
+
 public class Main{
     public static void main(String[] args) throws IOException {
-        Display.create(900,700,"Tanks",0xffffffff,4);
-        Timer t=new Timer(1000 / 60, new AbstractAction(){
-            public void actionPerformed(ActionEvent e){
-                Display.clear();
-                Display.paintComponent1();
-                Display.paintComponent4();
-                Display.paintComponent2();
-                Display.paintComponent3();
-                Display.paintComponent5();
-                Display.swapBuffers();
-                Display.isGame();
-            }
-        });
-        t.setRepeats(true);
-        t.start();
+        JFrame jframe=new JFrame("Tanks");
+        jframe.setSize(950,700);
+        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        jframe.setBackground(Color.GRAY);
+        jframe.setLocationRelativeTo(null);
+        jframe.setVisible(true);
+        Map map=new Map();
+        jframe.add(map);
+        Tank tank=new Tank(775,550,"UP");
+        jframe.add(tank);
     }
 }
 
