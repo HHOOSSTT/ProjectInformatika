@@ -3,11 +3,24 @@ package Tanks.display;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
-public class Map extends JPanel {
+
+public class Map extends JPanel implements KeyListener {
+
+    public Tank tank = new Tank(775,525,"UP");
+    public Bullet bullet=null;
+    public Timer timer;
+
+    public Map() throws IOException {
+        setFocusable(true);
+        addKeyListener(this);
+    }
+
     @Override
-    public void paintComponent(Graphics g){
+    protected void paintComponent(Graphics g){
         super.paintComponent(g);
         Image imageStenka=null;
         try {
@@ -89,7 +102,46 @@ public class Map extends JPanel {
         g.drawImage(imageStenka, 175, 300, 150, 75, null);
         g.drawImage(imageStenka, 600, 300, 150, 75, null);
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        tank.paintComponent(g);
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {}
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int f=e.getKeyCode();
+        if(f==KeyEvent.VK_W){
+            tank.moveUp(tank.imagetankNOW.getGraphics());
+        }
+        if(f==KeyEvent.VK_A){
+            tank.moveLEFT(tank.imagetankNOW.getGraphics());
+        }
+        if(f==KeyEvent.VK_S){
+            tank.moveDOWN(tank.imagetankNOW.getGraphics());
+        }
+        if(f==KeyEvent.VK_D){
+            tank.moveRIGHT(tank.imagetankNOW.getGraphics());
+        }
+        if(f==KeyEvent.VK_SPACE){
+            if(tank.getDirection().equals("UP")){
+                Bullet bullet = new Bullet(tank.getTankx()+8,tank.getTanky()-5,"UP",tank);
+                add(bullet);
+            }
+            if(tank.getDirection().equals("LEFT")){
+                Bullet bullet = new Bullet(tank.getTankx()-5,tank.getTanky()+8,"LEFT",tank);
+                add(bullet);
+            }
+            if(tank.getDirection().equals("DOWN")){
+                Bullet bullet = new Bullet(tank.getTankx()+8,tank.getTanky()+30,"DOWN",tank);
+                add(bullet);
+            }
+            if(tank.getDirection().equals("RIGHT")){
+                Bullet bullet = new Bullet(tank.getTankx()+30,tank.getTanky()+8,"RIGHT",tank);
+                add(bullet);
+            }
+        }
+        repaint();
+    }
+    @Override
+    public void keyReleased(KeyEvent e) {}
 }
-
