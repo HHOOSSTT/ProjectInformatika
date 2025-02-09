@@ -1,51 +1,67 @@
 package Tanks.display;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Bullet extends JPanel{
-    private int bulletX;
-    private int bulletY;
-    private Color color;
-    private boolean moveUP;
-    private boolean moveLEFT;
-    private boolean moveDOWN;
-    private boolean moveRIGHT;
-    private int dX=5;
-    private int dY=5;
-    private Timer timer;
-    public Bullet(int bulletX, int bulletY, Color color, boolean moveUP, boolean moveLEFT, boolean moveDOWN, boolean moveRIGHT){
+public class Bullet extends JComponent implements ActionListener{
+    public int bulletX;
+    public int bulletY;
+    private final Color color=Color.red;
+    public String direction;
+    public Tank tank;
+    private final int dX=5;
+    private final int dY=5;
+    private final Timer timer;
+
+    public Bullet(int bulletX, int bulletY,String direction,Tank tank){
         this.bulletX=bulletX;
         this.bulletY=bulletY;
-        this.color=color;
-        this.moveUP=moveUP;
-        this.moveLEFT=moveLEFT;
-        this.moveDOWN=moveDOWN;
-        this.moveRIGHT=moveRIGHT;
-        timer=new Timer(20, (ActionListener) this);
+        this.direction=direction;
+        this.tank=tank;
+        timer=new Timer(20,this);
         timer.start();
     }
 
-    @Override
-    public void paintComponent(Graphics g){
-        super.paintComponent(g);
+    protected void paintComponent(Graphics g){
+        if(g==null){
+            return;
+        }
         g.setColor(color);
         g.fillOval(bulletX, bulletY, 10, 10);
     }
 
-    public void movement() {
-        if(moveUP){
-            bulletY-=dY;
+    public void moveBUP(Graphics g){
+        bulletY-=dY;
+        paintComponent(g);
+    }
+    public void moveBLEFT(Graphics g){
+        bulletX-=dX;
+        paintComponent(g);
+    }
+    public void moveBDOWN(Graphics g){
+        bulletY+=dY;
+        paintComponent(g);
+    }
+    public void moveBRIGHT(Graphics g){
+        bulletX+=dX;
+        paintComponent(g);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(direction.equals("UP")){
+            moveBUP(getGraphics());
         }
-        if(moveLEFT){
-            bulletX-=dX;
+        if(direction.equals("LEFT")){
+            moveBLEFT(getGraphics());
         }
-        if(moveDOWN){
-            bulletY+=dY;
+        if(direction.equals("DOWN")){
+            moveBDOWN(getGraphics());
         }
-        if(moveRIGHT){
-            bulletX+=dX;
+        if (direction.equals("RIGHT")){
+            moveBRIGHT(getGraphics());
         }
-        repaint();
     }
 }
