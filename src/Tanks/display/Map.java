@@ -1,5 +1,7 @@
 package Tanks.display;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -11,17 +13,28 @@ import java.io.IOException;
 public class Map extends JPanel implements KeyListener {
 
     public Tank tank = new Tank(775,525,"UP");
-    public Bullet bullet=null;
-    public Timer timer;
+    private final List<Bullet> bullets = new ArrayList<>();
 
-    public Map() throws IOException {
+    public Map() throws IOException{
         setFocusable(true);
         addKeyListener(this);
+        Timer game=new Timer(16, e ->{
+            updateBullet();
+            repaint();
+        });
+        game.start();
     }
 
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        String s1 = "Score 0";
+        g.drawString(s1,50,50);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        String s2 = "Lifes 3";
+        g.drawString(s2,750,50);
         Image imageStenka=null;
         try {
             imageStenka = ImageIO.read(new File("stenka.png"));
@@ -103,12 +116,22 @@ public class Map extends JPanel implements KeyListener {
         g.drawImage(imageStenka, 600, 300, 150, 75, null);
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         tank.paintComponent(g);
+        for(Bullet bullet:bullets){
+            bullet.paintComponent(g);
+        }
+    }
+
+    private void updateBullet(){
+        for (Bullet bullet:bullets){
+            bullet.move();
+        }
+        bullets.removeIf(bullet -> !bullet.isCanMove());
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e){}
     @Override
-    public void keyPressed(KeyEvent e) {
+    public void keyPressed(KeyEvent e){
         int f=e.getKeyCode();
         if(f==KeyEvent.VK_W){
             tank.moveUp(tank.imagetankNOW.getGraphics());
@@ -125,23 +148,23 @@ public class Map extends JPanel implements KeyListener {
         if(f==KeyEvent.VK_SPACE){
             if(tank.getDirection().equals("UP")){
                 Bullet bullet = new Bullet(tank.getTankx()+8,tank.getTanky()-5,"UP",tank);
-                add(bullet);
+                bullets.add(bullet);
             }
             if(tank.getDirection().equals("LEFT")){
                 Bullet bullet = new Bullet(tank.getTankx()-5,tank.getTanky()+8,"LEFT",tank);
-                add(bullet);
+                bullets.add(bullet);
             }
             if(tank.getDirection().equals("DOWN")){
-                Bullet bullet = new Bullet(tank.getTankx()+8,tank.getTanky()+30,"DOWN",tank);
-                add(bullet);
+                Bullet bullet = new Bullet(tank.getTankx()+8,tank.getTanky()+20,"DOWN",tank);
+                bullets.add(bullet);
             }
             if(tank.getDirection().equals("RIGHT")){
-                Bullet bullet = new Bullet(tank.getTankx()+30,tank.getTanky()+8,"RIGHT",tank);
-                add(bullet);
+                Bullet bullet = new Bullet(tank.getTankx()+20,tank.getTanky()+8,"RIGHT",tank);
+                bullets.add(bullet);
             }
         }
         repaint();
     }
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e){}
 }
