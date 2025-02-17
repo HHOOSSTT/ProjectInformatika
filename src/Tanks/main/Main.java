@@ -2,18 +2,16 @@ package Tanks.main;
 
 import Tanks.display.Map;
 import java.io.IOException;
-import java.util.Scanner;
 import javax.swing.*;
 
 public class Main{
     public static void main(String[] args) throws IOException {
-        Scanner sc=new Scanner(System.in);
         JFrame frame = new JFrame("Tanks");
         Map map=null;
         try{
             map=new Map();
         }catch(IOException e){
-            System.err.println("Ошибка при создании карты: ");
+            System.err.println("Ошибка при создании карты");
             return;
         }
         frame.add(map);
