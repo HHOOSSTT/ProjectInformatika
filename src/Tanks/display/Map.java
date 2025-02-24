@@ -1,7 +1,5 @@
 package Tanks.display;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -9,33 +7,47 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Map extends JPanel implements KeyListener {
 
-    public Tank tank = new Tank(775,525,"UP");
-    private final List<Bullet> bullets = new ArrayList<>();
+    public Tank tank = new Tank(775, 525, "UP");
+    public TankBot tankbot1 = new TankBot(775, 100, "LEFT");
+    public TankBot tankbot2 = new TankBot(125, 200, "DOWN");
+    public TankBot tankbot3 = new TankBot(350, 275, "RIGHT");
+    private final ArrayList<Bullet> bullets = new ArrayList<>();
+    private boolean spacePressed = false;
+    private boolean wPressed = false;
+    private boolean aPressed = false;
+    private boolean sPressed = false;
+    private boolean dPressed = false;
+    private final ArrayList<TankBot> tankBots = new ArrayList<>(Arrays.asList(tankbot1, tankbot2, tankbot3));
+    private int score = 0;
+    private int lifes = 3;
 
-    public Map() throws IOException{
+    public Map() throws IOException {
         setFocusable(true);
         addKeyListener(this);
-        Timer game=new Timer(16, e ->{
-            updateBullet();
+        Timer game = new Timer(16, e -> {
+            updateGame();
             repaint();
         });
         game.start();
     }
 
+    String s1 = "";
+    String s2 = "";
     @Override
-    protected void paintComponent(Graphics g){
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 40));
-        String s1 = "Score 0";
-        g.drawString(s1,50,50);
-        g.setFont(new Font("Arial", Font.BOLD, 40));
-        String s2 = "Lifes 3";
-        g.drawString(s2,750,50);
-        Image imageStenka=null;
+        s1 = "Score "+score;
+        g.drawString(s1, 50, 50);
+        s2 = "Lifes "+lifes;
+        g.drawString(s2, 750, 50);
+        Image imageStenka = null;
         try {
             imageStenka = ImageIO.read(new File("stenka.png"));
         } catch (IOException e) {
@@ -47,30 +59,30 @@ public class Map extends JPanel implements KeyListener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        int x=100;
-        while(x<=750){
+        int x = 100;
+        while (x <= 750) {
             g.drawImage(imageStenkavokrug, x, 75, 50, 25, null);
-            x+=50;
+            x += 50;
         }
-        g.drawImage(imageStenkavokrug,800,75,25,25,null);
+        g.drawImage(imageStenkavokrug, 800, 75, 25, 25, null);
 
-        int y=100;
-        while(y<=500){
+        int y = 100;
+        while (y <= 500) {
             g.drawImage(imageStenkavokrug, 100, y, 25, 50, null);
-            y+=50;
+            y += 50;
         }
 
-        int w=100;
-        while(w<=750){
+        int w = 100;
+        while (w <= 750) {
             g.drawImage(imageStenkavokrug, w, 550, 50, 25, null);
-            w+=50;
+            w += 50;
         }
         g.drawImage(imageStenkavokrug, 800, 550, 25, 25, null);
 
-        int z=100;
-        while(z<=500){
+        int z = 100;
+        while (z <= 500) {
             g.drawImage(imageStenkavokrug, 800, z, 25, 50, null);
-            z+=50;
+            z += 50;
         }
 
         g.setColor(new Color(0xD3D3D3));
@@ -116,55 +128,86 @@ public class Map extends JPanel implements KeyListener {
         g.drawImage(imageStenka, 600, 300, 150, 75, null);
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         tank.paintComponent(g);
-        for(Bullet bullet:bullets){
+        for (Bullet bullet : bullets) {
             bullet.paintComponent(g);
         }
+        for (TankBot tankbot : tankBots){
+            if(tankbot.isAlive()){
+                tankbot.paintComponent(g);
+            }
+        }
     }
 
-    private void updateBullet(){
-        for (Bullet bullet:bullets){
+    private void updateGame() {
+        for (Bullet bullet : bullets) {
             bullet.move();
         }
-        bullets.removeIf(bullet -> !bullet.isCanMove());
+        for (TankBot tankbot : tankBots){
+            tankbot.updateBullets();
+            bullets.removeIf(bullet -> {
+                if(tankbot.isHit(bullet.getBulletX(), bullet.getBulletY())) {
+                    if(tankbot.isAlive()) {
+                        score ++;
+                        s1="Score "+score;
+                    }
+                    return true;
+                }
+                return !bullet.isCanMove();
+            });
+        }
     }
 
     @Override
-    public void keyTyped(KeyEvent e){}
+    public void keyTyped(KeyEvent e) {
+    }
+
     @Override
-    public void keyPressed(KeyEvent e){
-        int f=e.getKeyCode();
-        if(f==KeyEvent.VK_W){
+    public void keyPressed(KeyEvent e) {
+        int f = e.getKeyCode();
+        if ((f == KeyEvent.VK_W) && (!wPressed)) {
             tank.moveUp(tank.imagetankNOW.getGraphics());
+            wPressed = true;
         }
-        if(f==KeyEvent.VK_A){
+        if ((f == KeyEvent.VK_A) && (!aPressed)) {
             tank.moveLEFT(tank.imagetankNOW.getGraphics());
+            aPressed = true;
         }
-        if(f==KeyEvent.VK_S){
+        if ((f == KeyEvent.VK_S) && (!sPressed)) {
             tank.moveDOWN(tank.imagetankNOW.getGraphics());
+            sPressed = true;
         }
-        if(f==KeyEvent.VK_D){
+        if ((f == KeyEvent.VK_D) && (!dPressed)) {
             tank.moveRIGHT(tank.imagetankNOW.getGraphics());
+            dPressed = true;
         }
-        if(f==KeyEvent.VK_SPACE){
-            if(tank.getDirection().equals("UP")){
-                Bullet bullet = new Bullet(tank.getTankx()+8,tank.getTanky()-5,"UP",tank);
+        if ((f == KeyEvent.VK_SPACE)&&(!spacePressed)) {
+            if (tank.getDirection().equals("UP")) {
+                Bullet bullet = new Bullet(tank.getTankx() + 8, tank.getTanky() - 5, "UP");
                 bullets.add(bullet);
             }
-            if(tank.getDirection().equals("LEFT")){
-                Bullet bullet = new Bullet(tank.getTankx()-5,tank.getTanky()+8,"LEFT",tank);
+            if (tank.getDirection().equals("LEFT")) {
+                Bullet bullet = new Bullet(tank.getTankx() - 5, tank.getTanky() + 8, "LEFT");
                 bullets.add(bullet);
             }
-            if(tank.getDirection().equals("DOWN")){
-                Bullet bullet = new Bullet(tank.getTankx()+8,tank.getTanky()+20,"DOWN",tank);
+            if (tank.getDirection().equals("DOWN")) {
+                Bullet bullet = new Bullet(tank.getTankx() + 8, tank.getTanky() + 20, "DOWN");
                 bullets.add(bullet);
             }
-            if(tank.getDirection().equals("RIGHT")){
-                Bullet bullet = new Bullet(tank.getTankx()+20,tank.getTanky()+8,"RIGHT",tank);
+            if (tank.getDirection().equals("RIGHT")) {
+                Bullet bullet = new Bullet(tank.getTankx() + 20, tank.getTanky() + 8, "RIGHT");
                 bullets.add(bullet);
             }
+            spacePressed = true;
         }
         repaint();
     }
+
     @Override
-    public void keyReleased(KeyEvent e){}
+    public void keyReleased(KeyEvent e) {
+        spacePressed = false;
+        wPressed = false;
+        aPressed = false;
+        sPressed = false;
+        dPressed = false;
+    }
 }
