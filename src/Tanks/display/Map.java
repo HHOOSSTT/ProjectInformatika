@@ -43,9 +43,9 @@ public class Map extends JPanel implements KeyListener {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 40));
-        s1 = "Score "+score;
+        s1 = "Score " + score;
         g.drawString(s1, 50, 50);
-        s2 = "Lifes "+lifes;
+        s2 = "Lifes " + lifes;
         g.drawString(s2, 750, 50);
         Image imageStenka = null;
         try {
@@ -146,14 +146,23 @@ public class Map extends JPanel implements KeyListener {
             tankbot.updateBullets();
             bullets.removeIf(bullet -> {
                 if(tankbot.isHit(bullet.getBulletX(), bullet.getBulletY())) {
-                    if(tankbot.isAlive()) {
+                    if(!tankbot.isAlive()) {
                         score ++;
-                        s1="Score "+score;
                     }
                     return true;
                 }
                 return !bullet.isCanMove();
             });
+        }
+        for(TankBot tankbot : tankBots){
+            for (Bullet bullet : tankbot.getBotBullets().getBullets()) {
+                if (bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank.getTankx(), tank.getTanky())) {
+                    lifes--;
+                    tankbot.getBotBullets().getBullets().remove(bullet);
+                    tank.returnAfterHit();
+                    break;
+                }
+            }
         }
     }
 
@@ -164,19 +173,19 @@ public class Map extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int f = e.getKeyCode();
-        if ((f == KeyEvent.VK_W) && (!wPressed)) {
+        if (((f == KeyEvent.VK_UP) || (f == KeyEvent.VK_W)) && (!wPressed)) {
             tank.moveUp(tank.imagetankNOW.getGraphics());
             wPressed = true;
         }
-        if ((f == KeyEvent.VK_A) && (!aPressed)) {
+        if (((f == KeyEvent.VK_LEFT) || (f == KeyEvent.VK_A)) && (!aPressed)) {
             tank.moveLEFT(tank.imagetankNOW.getGraphics());
             aPressed = true;
         }
-        if ((f == KeyEvent.VK_S) && (!sPressed)) {
+        if (((f == KeyEvent.VK_DOWN) || (f == KeyEvent.VK_S)) && (!sPressed)) {
             tank.moveDOWN(tank.imagetankNOW.getGraphics());
             sPressed = true;
         }
-        if ((f == KeyEvent.VK_D) && (!dPressed)) {
+        if (((f == KeyEvent.VK_RIGHT) || (f == KeyEvent.VK_D)) && (!dPressed)) {
             tank.moveRIGHT(tank.imagetankNOW.getGraphics());
             dPressed = true;
         }
