@@ -7,9 +7,9 @@ import javax.swing.*;
 public class Main{
     public static void main(String[] args) throws IOException {
         JFrame frame = new JFrame("Tanks");
-        Map map=null;
+        Map map = null;
         try{
-            map=new Map();
+            map = new Map();
         }catch(IOException e){
             System.err.println("Ошибка при создании карты");
             return;
