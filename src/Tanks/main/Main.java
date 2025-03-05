@@ -4,13 +4,13 @@ import Tanks.display.Map;
 import java.io.IOException;
 import javax.swing.*;
 
-public class Main{
-    public static void main(String[] args) throws IOException {
+public class Main {
+    public static void main(String[] args) {
         JFrame frame = new JFrame("Tanks");
         Map map = null;
         try{
             map = new Map();
-        }catch(IOException e){
+        }catch(IOException e) {
             System.err.println("Ошибка при создании карты");
             return;
         }

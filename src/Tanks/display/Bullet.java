@@ -36,10 +36,10 @@ public class Bullet extends JComponent implements ActionListener {
         g.fillOval(bulletX,bulletY, 10, 10);
     }
 
-    public void move(){
+    public void move() {
         int d = 4;
         if(canMove){
-            if(direction.equals("UP")){
+            if(direction.equals("UP")) {
                 bulletY -= d;
             }
             if(direction.equals("DOWN")) {
@@ -57,23 +57,22 @@ public class Bullet extends JComponent implements ActionListener {
                 }
             }
             if(direction.equals("LEFT") || direction.equals("RIGHT")) {
-                if((((bulletX<=122)||(bulletX>=792))&&((bulletY==533)||(bulletY==433)||(bulletY==408)||(bulletY==283)||(bulletY==233)||(bulletY==208)||(bulletY==108)))||((bulletY==383)&&(((bulletX<=548)&&(bulletX>=492))||((bulletX<=421)&&(bulletX>=367))||(bulletX<=122)))||((bulletY==183)&&((bulletX<=122)||((bulletX>=391)&&(bulletX<=521))||(bulletX>=792)))||((bulletY==308)&&((bulletX>=594)||(bulletX<=323)))||((bulletY==258)&&(((bulletX<=723)&&(bulletX>=592))||((bulletX<=523)&&(bulletX>=392))||((bulletX<=323)&&(bulletX>=192))||(bulletX>=792)||(bulletX<=122)))){
+                if((((bulletX<=122)||(bulletX>=792))&&((bulletY==533)||(bulletY==433)||(bulletY==408)||(bulletY==283)||(bulletY==233)||(bulletY==208)||(bulletY==108)))||((bulletY==383)&&(((bulletX<=548)&&(bulletX>=492))||((bulletX<=421)&&(bulletX>=367))||(bulletX<=122)))||((bulletY==183)&&((bulletX<=122)||((bulletX>=391)&&(bulletX<=521))||(bulletX>=792)))||((bulletY==308)&&((bulletX>=594)||(bulletX<=323)))||((bulletY==258)&&(((bulletX<=723)&&(bulletX>=592))||((bulletX<=523)&&(bulletX>=392))||((bulletX<=323)&&(bulletX>=192))||(bulletX>=792)||(bulletX<=122)))||((bulletY==333)&&((bulletX<=421)||(bulletX>=491)))){
                     canMove=false;
                 }
             }
         }
     }
 
-    public boolean ishitTank(int bulletX, int bulletY, int tankX, int tankY){
-        boolean ishitTank=false;
+    public boolean ishitTank(int bulletX, int bulletY, int tankX, int tankY) {
         if(((bulletX>=tankX) && (bulletX<=tankX+25)) && ((bulletY<=tankY+25) && (bulletY>=tankY))){
-            ishitTank = true;
+            return true;
         }
-        return ishitTank;
+        return false;
     }
 
     @Override
-    public void actionPerformed(ActionEvent e){
+    public void actionPerformed(ActionEvent e) {
         move();
     }
 
