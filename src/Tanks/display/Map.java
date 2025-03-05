@@ -25,27 +25,27 @@ public class Map extends JPanel implements KeyListener {
     private final ArrayList<TankBot> tankBots = new ArrayList<>(Arrays.asList(tankbot1, tankbot2, tankbot3));
     private int score = 0;
     private int lifes = 3;
+    private boolean isGame = true;
+    private final Timer game;
 
     public Map() throws IOException {
         setFocusable(true);
         addKeyListener(this);
-        Timer game = new Timer(16, e -> {
+        game = new Timer(16, e -> {
             updateGame();
             repaint();
         });
         game.start();
     }
 
-    String s1 = "";
-    String s2 = "";
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 40));
-        s1 = "Score " + score;
+        String s1 = "Score " + score;
         g.drawString(s1, 50, 50);
-        s2 = "Lifes " + lifes;
+        String s2 = "Lifes " + lifes;
         g.drawString(s2, 750, 50);
         Image imageStenka = null;
         try {
@@ -138,7 +138,18 @@ public class Map extends JPanel implements KeyListener {
         }
     }
 
+    public void stopGame(){
+        isGame = false;
+        tankbot1.stopBotTimer();
+        tankbot2.stopBotTimer();
+        tankbot3.stopBotTimer();
+        game.stop();
+    }
+
     private void updateGame() {
+        if(lifes == 0){
+            stopGame();
+        }
         for (Bullet bullet : bullets) {
             bullet.move();
         }
@@ -154,7 +165,7 @@ public class Map extends JPanel implements KeyListener {
                 return !bullet.isCanMove();
             });
         }
-        for(TankBot tankbot : tankBots){
+        for (TankBot tankbot : tankBots){
             for (Bullet bullet : tankbot.getBotBullets().getBullets()) {
                 if (bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank.getTankx(), tank.getTanky())) {
                     lifes--;
@@ -167,29 +178,27 @@ public class Map extends JPanel implements KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
+    public void keyTyped(KeyEvent e) {}
     @Override
     public void keyPressed(KeyEvent e) {
         int f = e.getKeyCode();
-        if (((f == KeyEvent.VK_UP) || (f == KeyEvent.VK_W)) && (!wPressed)) {
+        if (((f == KeyEvent.VK_UP) || (f == KeyEvent.VK_W)) && (!wPressed) &&(isGame)) {
             tank.moveUp(tank.imagetankNOW.getGraphics());
             wPressed = true;
         }
-        if (((f == KeyEvent.VK_LEFT) || (f == KeyEvent.VK_A)) && (!aPressed)) {
+        if (((f == KeyEvent.VK_LEFT) || (f == KeyEvent.VK_A)) && (!aPressed) &&(isGame)) {
             tank.moveLEFT(tank.imagetankNOW.getGraphics());
             aPressed = true;
         }
-        if (((f == KeyEvent.VK_DOWN) || (f == KeyEvent.VK_S)) && (!sPressed)) {
+        if (((f == KeyEvent.VK_DOWN) || (f == KeyEvent.VK_S)) && (!sPressed) &&(isGame)) {
             tank.moveDOWN(tank.imagetankNOW.getGraphics());
             sPressed = true;
         }
-        if (((f == KeyEvent.VK_RIGHT) || (f == KeyEvent.VK_D)) && (!dPressed)) {
+        if (((f == KeyEvent.VK_RIGHT) || (f == KeyEvent.VK_D)) && (!dPressed) &&(isGame)) {
             tank.moveRIGHT(tank.imagetankNOW.getGraphics());
             dPressed = true;
         }
-        if ((f == KeyEvent.VK_SPACE)&&(!spacePressed)) {
+        if ((f == KeyEvent.VK_SPACE)&&(!spacePressed) &&(isGame)) {
             if (tank.getDirection().equals("UP")) {
                 Bullet bullet = new Bullet(tank.getTankx() + 8, tank.getTanky() - 5, "UP");
                 bullets.add(bullet);
@@ -210,7 +219,6 @@ public class Map extends JPanel implements KeyListener {
         }
         repaint();
     }
-
     @Override
     public void keyReleased(KeyEvent e) {
         spacePressed = false;
