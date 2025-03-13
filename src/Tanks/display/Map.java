@@ -32,7 +32,11 @@ public class Map extends JPanel implements KeyListener {
         setFocusable(true);
         addKeyListener(this);
         game = new Timer(16, e -> {
-            updateGame();
+            try {
+                updateGame();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             repaint();
         });
         game.start();
@@ -146,7 +150,7 @@ public class Map extends JPanel implements KeyListener {
         game.stop();
     }
 
-    private void updateGame() {
+    private void updateGame() throws IOException {
         if(lifes == 0){
             stopGame();
         }
@@ -154,6 +158,7 @@ public class Map extends JPanel implements KeyListener {
             bullet.move();
         }
         for (TankBot tankbot : tankBots){
+            if (!tankbot.isAlive()) continue;
             tankbot.updateBullets();
             bullets.removeIf(bullet -> {
                 if(tankbot.isHit(bullet.getBulletX(), bullet.getBulletY())) {
@@ -166,6 +171,7 @@ public class Map extends JPanel implements KeyListener {
             });
         }
         for (TankBot tankbot : tankBots){
+            if (!tankbot.isAlive()) continue;
             for (Bullet bullet : tankbot.getBotBullets().getBullets()) {
                 if (bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank.getTankx(), tank.getTanky())) {
                     lifes--;
@@ -175,6 +181,10 @@ public class Map extends JPanel implements KeyListener {
                 }
             }
         }
+        tankBots.removeIf(tankBot -> !tankBot.isAlive());
+        for(TankBot tankBot : tankBots){
+            tankBot.rotate();
+        }
     }
 
     @Override
@@ -183,19 +193,27 @@ public class Map extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int f = e.getKeyCode();
         if (((f == KeyEvent.VK_UP) || (f == KeyEvent.VK_W)) && (!wPressed) &&(isGame)) {
-            tank.moveUp(tank.imagetankNOW.getGraphics());
+            if(!tank.botisUP()){
+                tank.moveUp(tank.imagetankNOW.getGraphics());
+            }
             wPressed = true;
         }
         if (((f == KeyEvent.VK_LEFT) || (f == KeyEvent.VK_A)) && (!aPressed) &&(isGame)) {
-            tank.moveLEFT(tank.imagetankNOW.getGraphics());
+            if(!tank.botisLEFT()){
+                tank.moveLEFT(tank.imagetankNOW.getGraphics());
+            }
             aPressed = true;
         }
         if (((f == KeyEvent.VK_DOWN) || (f == KeyEvent.VK_S)) && (!sPressed) &&(isGame)) {
-            tank.moveDOWN(tank.imagetankNOW.getGraphics());
+            if(!tank.botisDOWN()){
+                tank.moveDOWN(tank.imagetankNOW.getGraphics());
+            }
             sPressed = true;
         }
         if (((f == KeyEvent.VK_RIGHT) || (f == KeyEvent.VK_D)) && (!dPressed) &&(isGame)) {
-            tank.moveRIGHT(tank.imagetankNOW.getGraphics());
+            if(!tank.botisRIGHT()){
+                tank.moveRIGHT(tank.imagetankNOW.getGraphics());
+            }
             dPressed = true;
         }
         if ((f == KeyEvent.VK_SPACE)&&(!spacePressed) &&(isGame)) {

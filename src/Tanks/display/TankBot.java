@@ -9,8 +9,8 @@ import java.io.IOException;
 public class TankBot {
     private int tankbotX;
     private int tankbotY;
-    private final String directionbot;
-    Image imagetankbotNOW;
+    private String directionbot;
+    private Image imagetankbotNOW;
     private boolean isAlive = true;
     private final Timer timertankbot;
     private final Timer shoottankbot;
@@ -51,20 +51,20 @@ public class TankBot {
     }
 
     public boolean isHit(int bulletX, int bulletY) {
-        boolean hit = false;
         if(!isAlive) {
             return false;
         }
         if(((bulletX>=tankbotX) && (bulletX<=tankbotX+25)) && ((bulletY<=tankbotY+25) && (bulletY>=tankbotY))) {
-            hit = true;
-        }
-        if(hit) {
+            clearBullets();
             isAlive = false;
+            tankbotX = -5000;
+            tankbotY = -5000;
+            return true;
         }
-        return hit;
+        return false;
     }
 
-    private void move() {
+    public void move() {
         if(isAlive){
             int dX=25;
             int dY=25;
@@ -92,7 +92,9 @@ public class TankBot {
     }
 
     public void updateBullets() {
-        botBullets.update();
+        if(isAlive){
+            botBullets.update();
+        }
     }
 
     public boolean isAlive() {
@@ -118,5 +120,32 @@ public class TankBot {
     public void stopBotTimer(){
         timertankbot.stop();
         shoottankbot.stop();
+    }
+
+    public void clearBullets() {
+        botBullets.getBullets().clear();
+    }
+
+    public void rotate() throws IOException {
+        if((tankbotX==125) && (tankbotY==525)){
+            setImagetankbotNOW("RIGHT");
+            this.directionbot = "RIGHT";
+        }
+        if((tankbotX==725) && (tankbotY==100)){
+            setImagetankbotNOW("DOWN");
+            this.directionbot = "DOWN";
+        }
+        if((tankbotX==725) && (tankbotY==225)){
+            setImagetankbotNOW("LEFT");
+            this.directionbot = "LEFT";
+        }
+        if((tankbotX==550) && (tankbotY==275)){
+            setImagetankbotNOW("DOWN");
+            this.directionbot = "DOWN";
+        }
+        if((tankbotX==550) && (tankbotY==425)){
+            setImagetankbotNOW("RIGHT");
+            this.directionbot = "RIGHT";
+        }
     }
 }
