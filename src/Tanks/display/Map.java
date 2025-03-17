@@ -12,7 +12,8 @@ import java.util.Arrays;
 
 public class Map extends JPanel implements KeyListener {
 
-    public Tank tank = new Tank(775, 525, "UP");
+    public Tank tank1 = new Tank(175, 525, "UP");
+    public Tank tank2 = new Tank(775, 525, "UP");
     public TankBot tankbot1 = new TankBot(775, 100, "LEFT");
     public TankBot tankbot2 = new TankBot(125, 200, "DOWN");
     public TankBot tankbot3 = new TankBot(350, 275, "RIGHT");
@@ -22,9 +23,15 @@ public class Map extends JPanel implements KeyListener {
     private boolean aPressed = false;
     private boolean sPressed = false;
     private boolean dPressed = false;
+    private boolean upPressed = false;
+    private boolean leftPressed = false;
+    private boolean downPressed = false;
+    private boolean rightPressed = false;
+    private boolean shiftPressed = false;
     private final ArrayList<TankBot> tankBots = new ArrayList<>(Arrays.asList(tankbot1, tankbot2, tankbot3));
     private int score = 0;
-    private int lifes = 3;
+    private int lifes1 = 3;
+    private int lifes2 = 3;
     private boolean isGame = true;
     private final Timer game;
 
@@ -46,11 +53,13 @@ public class Map extends JPanel implements KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.BOLD, 40));
-        String s1 = "Score " + score;
-        g.drawString(s1, 50, 50);
-        String s2 = "Lifes " + lifes;
-        g.drawString(s2, 750, 50);
+        g.setFont(new Font("Arial", Font.BOLD, 30));
+        String s1 = "Score:" + score;
+        g.drawString(s1, 100, 50);
+        String s2 = "Lifes player1:" + lifes1;
+        g.drawString(s2, 320, 50);
+        String s3 = "Lifes player2:" + lifes2;
+        g.drawString(s3, 610, 50);
         Image imageStenka = null;
         try {
             imageStenka = ImageIO.read(new File("stenka.png"));
@@ -131,14 +140,13 @@ public class Map extends JPanel implements KeyListener {
         g.drawImage(imageStenka, 175, 300, 150, 75, null);
         g.drawImage(imageStenka, 600, 300, 150, 75, null);
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        tank.paintComponent(g);
+        tank1.paintComponent(g);
+        tank2.paintComponent(g);
         for (Bullet bullet : bullets) {
             bullet.paintComponent(g);
         }
         for (TankBot tankbot : tankBots){
-            if(tankbot.isAlive()){
-                tankbot.paintComponent(g);
-            }
+            tankbot.paintComponent(g);
         }
     }
 
@@ -151,8 +159,14 @@ public class Map extends JPanel implements KeyListener {
     }
 
     private void updateGame() throws IOException {
-        if(lifes == 0){
+        if((lifes1 <= 0) && (lifes2 <= 0)) {
             stopGame();
+        }
+        if(lifes1 == 0){
+            tank1.remove();
+        }
+        if(lifes2 == 0){
+            tank2.remove();
         }
         for (Bullet bullet : bullets) {
             bullet.move();
@@ -173,17 +187,31 @@ public class Map extends JPanel implements KeyListener {
         for (TankBot tankbot : tankBots){
             if (!tankbot.isAlive()) continue;
             for (Bullet bullet : tankbot.getBotBullets().getBullets()) {
-                if (bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank.getTankx(), tank.getTanky())) {
-                    lifes--;
+                if (bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank1.getTankx(), tank1.getTanky())) {
+                    lifes1--;
                     tankbot.getBotBullets().getBullets().remove(bullet);
-                    tank.returnAfterHit();
+                    tank1.returnAfterHit1();
+                    break;
+                }
+                if (bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank2.getTankx(), tank2.getTanky())) {
+                    lifes2--;
+                    tankbot.getBotBullets().getBullets().remove(bullet);
+                    tank2.returnAfterHit2();
                     break;
                 }
             }
         }
-        tankBots.removeIf(tankBot -> !tankBot.isAlive());
         for(TankBot tankBot : tankBots){
             tankBot.rotate();
+        }
+        if(!tankbot1.isAlive()){
+            tankbot1.returnAfterHit(775, 100, "LEFT");
+        }
+        if(!tankbot2.isAlive()){
+            tankbot2.returnAfterHit(125, 200, "DOWN");
+        }
+        if(!tankbot3.isAlive()){
+            tankbot3.returnAfterHit(350, 275, "RIGHT");
         }
     }
 
@@ -192,48 +220,91 @@ public class Map extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int f = e.getKeyCode();
-        if (((f == KeyEvent.VK_UP) || (f == KeyEvent.VK_W)) && (!wPressed) &&(isGame)) {
-            if(!tank.botisUP()){
-                tank.moveUp(tank.imagetankNOW.getGraphics());
+        if ((f == KeyEvent.VK_W) && (!wPressed) && (isGame) && (lifes1 !=0)) {
+            if(!tank1.botisUP()){
+                tank1.moveUp(tank1.imagetankNOW.getGraphics());
             }
             wPressed = true;
         }
-        if (((f == KeyEvent.VK_LEFT) || (f == KeyEvent.VK_A)) && (!aPressed) &&(isGame)) {
-            if(!tank.botisLEFT()){
-                tank.moveLEFT(tank.imagetankNOW.getGraphics());
+        if ((f == KeyEvent.VK_UP) && (!upPressed) && (isGame) && (lifes2 != 0)) {
+            if(!tank2.botisUP()){
+                tank2.moveUp(tank2.imagetankNOW.getGraphics());
+            }
+            upPressed = true;
+        }
+        if ((f == KeyEvent.VK_A) && (!aPressed) && (isGame) && (lifes1 != 0)) {
+            if(!tank1.botisLEFT()){
+                tank1.moveLEFT(tank1.imagetankNOW.getGraphics());
             }
             aPressed = true;
         }
-        if (((f == KeyEvent.VK_DOWN) || (f == KeyEvent.VK_S)) && (!sPressed) &&(isGame)) {
-            if(!tank.botisDOWN()){
-                tank.moveDOWN(tank.imagetankNOW.getGraphics());
+        if ((f == KeyEvent.VK_LEFT) && (!leftPressed) && (isGame) && (lifes2 != 0)) {
+            if(!tank2.botisLEFT()){
+                tank2.moveLEFT(tank2.imagetankNOW.getGraphics());
+            }
+            leftPressed = true;
+        }
+        if ((f == KeyEvent.VK_S) && (!sPressed) && (isGame) && (lifes1 != 0)) {
+            if(!tank1.botisDOWN()){
+                tank1.moveDOWN(tank1.imagetankNOW.getGraphics());
             }
             sPressed = true;
         }
-        if (((f == KeyEvent.VK_RIGHT) || (f == KeyEvent.VK_D)) && (!dPressed) &&(isGame)) {
-            if(!tank.botisRIGHT()){
-                tank.moveRIGHT(tank.imagetankNOW.getGraphics());
+        if ((f == KeyEvent.VK_DOWN) && (!downPressed) && (isGame) && (lifes2 != 0)) {
+            if(!tank2.botisDOWN()){
+                tank2.moveDOWN(tank2.imagetankNOW.getGraphics());
+            }
+            downPressed = true;
+        }
+        if ((f == KeyEvent.VK_D) && (!dPressed) && (isGame) && (lifes1 != 0)) {
+            if(!tank1.botisRIGHT()){
+                tank1.moveRIGHT(tank1.imagetankNOW.getGraphics());
             }
             dPressed = true;
         }
-        if ((f == KeyEvent.VK_SPACE)&&(!spacePressed) &&(isGame)) {
-            if (tank.getDirection().equals("UP")) {
-                Bullet bullet = new Bullet(tank.getTankx() + 8, tank.getTanky() - 5, "UP");
+        if ((f == KeyEvent.VK_RIGHT) && (!rightPressed) && (isGame) && (lifes2 != 0)) {
+            if(!tank2.botisRIGHT()){
+                tank2.moveRIGHT(tank2.imagetankNOW.getGraphics());
+            }
+            rightPressed = true;
+        }
+        if ((f == KeyEvent.VK_SPACE) && (!spacePressed) && (isGame) && (lifes1 != 0)) {
+            if (tank1.getDirection().equals("UP")) {
+                Bullet bullet = new Bullet(tank1.getTankx() + 8, tank1.getTanky() - 5, "UP");
                 bullets.add(bullet);
             }
-            if (tank.getDirection().equals("LEFT")) {
-                Bullet bullet = new Bullet(tank.getTankx() - 5, tank.getTanky() + 8, "LEFT");
+            if (tank1.getDirection().equals("LEFT")) {
+                Bullet bullet = new Bullet(tank1.getTankx() - 5, tank1.getTanky() + 8, "LEFT");
                 bullets.add(bullet);
             }
-            if (tank.getDirection().equals("DOWN")) {
-                Bullet bullet = new Bullet(tank.getTankx() + 8, tank.getTanky() + 20, "DOWN");
+            if (tank1.getDirection().equals("DOWN")) {
+                Bullet bullet = new Bullet(tank1.getTankx() + 8, tank1.getTanky() + 20, "DOWN");
                 bullets.add(bullet);
             }
-            if (tank.getDirection().equals("RIGHT")) {
-                Bullet bullet = new Bullet(tank.getTankx() + 20, tank.getTanky() + 8, "RIGHT");
+            if (tank1.getDirection().equals("RIGHT")) {
+                Bullet bullet = new Bullet(tank1.getTankx() + 20, tank1.getTanky() + 8, "RIGHT");
                 bullets.add(bullet);
             }
             spacePressed = true;
+        }
+        if ((f == KeyEvent.VK_SHIFT) && (!shiftPressed) && (isGame) && (lifes2 != 0)) {
+            if (tank2.getDirection().equals("UP")) {
+                Bullet bullet = new Bullet(tank2.getTankx() + 8, tank2.getTanky() - 5, "UP");
+                bullets.add(bullet);
+            }
+            if (tank2.getDirection().equals("LEFT")) {
+                Bullet bullet = new Bullet(tank2.getTankx() - 5, tank2.getTanky() + 8, "LEFT");
+                bullets.add(bullet);
+            }
+            if (tank2.getDirection().equals("DOWN")) {
+                Bullet bullet = new Bullet(tank2.getTankx() + 8, tank2.getTanky() + 20, "DOWN");
+                bullets.add(bullet);
+            }
+            if (tank2.getDirection().equals("RIGHT")) {
+                Bullet bullet = new Bullet(tank2.getTankx() + 20, tank2.getTanky() + 8, "RIGHT");
+                bullets.add(bullet);
+            }
+            shiftPressed = true;
         }
         repaint();
     }
@@ -244,5 +315,10 @@ public class Map extends JPanel implements KeyListener {
         aPressed = false;
         sPressed = false;
         dPressed = false;
+        upPressed = false;
+        leftPressed = false;
+        downPressed = false;
+        rightPressed = false;
+        shiftPressed = false;
     }
 }
