@@ -129,10 +129,24 @@ public class Tank {
         }
     }
 
-    public void returnAfterHit(){
+    public void returnAfterHit1(){
+        tankx = 175;
+        tanky = 525;
+        direction = "UP";
+        setimageTank(direction);
+    }
+
+    public void returnAfterHit2(){
         tankx = 775;
         tanky = 525;
         direction = "UP";
         setimageTank(direction);
+    }
+
+    public void remove(){
+        tankx = -1000;
+        tanky = -1000;
+        imagetankNOW = null;
+        direction = "";
     }
 }
