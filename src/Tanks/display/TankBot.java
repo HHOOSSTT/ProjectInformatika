@@ -44,9 +44,7 @@ public class TankBot {
     }
 
     public void paintComponent(Graphics g) {
-        if(isAlive){
-            g.drawImage(imagetankbotNOW, tankbotX, tankbotY, 25, 25, null);
-        }
+        g.drawImage(imagetankbotNOW, tankbotX, tankbotY, 25, 25, null);
         botBullets.paintComponent(g);
     }
 
@@ -147,5 +145,13 @@ public class TankBot {
             setImagetankbotNOW("RIGHT");
             this.directionbot = "RIGHT";
         }
+    }
+
+    public void returnAfterHit(int tankbotX, int tankbotY, String directionbot) throws IOException {
+        this.tankbotX = tankbotX;
+        this.tankbotY = tankbotY;
+        this.directionbot = directionbot;
+        setImagetankbotNOW(directionbot);
+        isAlive = true;
     }
 }
