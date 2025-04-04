@@ -10,7 +10,7 @@ public class Bullet extends JComponent implements ActionListener {
     public int bulletY;
     private final Color color = Color.red;
     public String direction;
-    private boolean canMove = true;;
+    private boolean canMove = true;
 
     public Bullet(int bulletX, int bulletY, String direction) {
         this.bulletX = bulletX;
@@ -52,7 +52,7 @@ public class Bullet extends JComponent implements ActionListener {
                 bulletX += d;
             }
             if(direction.equals("UP") || direction.equals("DOWN")) {
-                if((((bulletY<=96)||(bulletY>=541))&&((bulletX==783)||(bulletX==583)||(bulletX==333)||(bulletX==133)))||(((bulletX==158)||(bulletX==758))&&((bulletY>=442)||(bulletY<=172)))||(((bulletX==233)||(bulletX==283)||(bulletX==633)||(bulletX==683))&&((bulletY>=541)||((bulletY<=374)&&(bulletY>=299))||((bulletY<=274)&&(bulletY>=244))||(bulletY<=96)))||(((bulletX==183)||(bulletX==733))&&((bulletY>=541)||((bulletY<=374)&&(bulletY>=299))||(bulletY<=97)))||(((bulletX==358)||(bulletX==558))&&((bulletY>=442)||(bulletY<=171)))||(((bulletX==383)||(bulletX==533))&&(((bulletY>=317)&&(bulletY<=396))||(bulletY<=96)||(bulletY>=541)))||(((bulletX==433)||(bulletX==483))&&((bulletY<=96)||((bulletY<=374)&&(bulletY>=346))||((bulletY<=274)&&(bulletY>=242))||(bulletY>=541)))||((bulletX==458)&&((bulletY>=443)||((bulletY<=373)&&(bulletY>=343))||(bulletY<=273)))){
+                if((((bulletY<=96)||(bulletY>=541))&&((bulletX==783)||(bulletX==583)||(bulletX==333)||(bulletX==133)))||(((bulletX==158)||(bulletX==758))&&((bulletY>=442)||(bulletY<=172)))||(((bulletX==233)||(bulletX==283)||(bulletX==633)||(bulletX==683))&&((bulletY>=541)||((bulletY<=374)&&(bulletY>=299))||((bulletY<=274)&&(bulletY>=244))||(bulletY<=96)))||(((bulletX==183)||(bulletX==733))&&((bulletY>=541)||((bulletY<=374)&&(bulletY>=293))||(bulletY<=97)))||(((bulletX==358)||(bulletX==558))&&((bulletY>=442)||(bulletY<=171)))||(((bulletX==383)||(bulletX==533))&&(((bulletY>=317)&&(bulletY<=396))||(bulletY<=96)||(bulletY>=541)))||(((bulletX==433)||(bulletX==483))&&((bulletY<=96)||((bulletY<=374)&&(bulletY>=346))||((bulletY<=274)&&(bulletY>=242))||(bulletY>=541)))||((bulletX==458)&&((bulletY>=443)||((bulletY<=373)&&(bulletY>=343))||(bulletY<=273)))){
                     canMove=false;
                 }
             }
@@ -78,5 +78,9 @@ public class Bullet extends JComponent implements ActionListener {
 
     public boolean isCanMove(){
         return canMove;
+    }
+
+    public void setcanMove(boolean canMove){
+        this.canMove = canMove;
     }
 }
