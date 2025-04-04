@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class TankBot {
     private int tankbotX;
@@ -13,8 +14,8 @@ public class TankBot {
     private Image imagetankbotNOW;
     private boolean isAlive = true;
     private final Timer timertankbot;
+    private final ArrayList<Bullet> botbullets;
     private final Timer shoottankbot;
-    private final BotBullets botBullets;
 
     public void setImagetankbotNOW(String directionbot) throws IOException {
         if(directionbot.equals("UP")) {
@@ -31,35 +32,43 @@ public class TankBot {
         }
     }
 
-    public TankBot(int tankbotX, int tankbotY, String directionbot) throws IOException {
+    public TankBot(int tankbotX, int tankbotY, String directionbot, ArrayList<Bullet> botbullets) throws IOException {
         this.tankbotX=tankbotX;
         this.tankbotY=tankbotY;
         this.directionbot=directionbot;
         setImagetankbotNOW(directionbot);
         timertankbot = new Timer(2500, e -> move());
         timertankbot.start();
-        this.botBullets = new BotBullets(this);
-        shoottankbot = new Timer(3500, e -> botBullets.shoot());
+        this.botbullets = botbullets;
+        shoottankbot = new Timer(3500, e->shoot());
         shoottankbot.start();
     }
 
     public void paintComponent(Graphics g) {
         g.drawImage(imagetankbotNOW, tankbotX, tankbotY, 25, 25, null);
-        botBullets.paintComponent(g);
     }
 
-    public boolean isHit(int bulletX, int bulletY) {
-        if(!isAlive) {
-            return false;
+    public void shoot(){
+        int bulletX = tankbotX;
+        int bulletY = tankbotY;
+        String direction = directionbot;
+        if(direction.equals("UP")) {
+            bulletX += 8;
+            bulletY -= 5;
         }
-        if(((bulletX>=tankbotX) && (bulletX<=tankbotX+25)) && ((bulletY<=tankbotY+25) && (bulletY>=tankbotY))) {
-            clearBullets();
-            isAlive = false;
-            tankbotX = -5000;
-            tankbotY = -5000;
-            return true;
+        if(direction.equals("LEFT")) {
+            bulletX -= 5;
+            bulletY += 8;
         }
-        return false;
+        if(direction.equals("DOWN")) {
+            bulletX += 8;
+            bulletY += 20;
+        }
+        if(direction.equals("RIGHT")) {
+            bulletX += 20;
+            bulletY += 8;
+        }
+        botbullets.add(new Bullet(bulletX, bulletY, direction));
     }
 
     public void move() {
@@ -82,16 +91,10 @@ public class TankBot {
                 }
             }
             if(directionbot.equals("RIGHT")) {
-                if(((tankbotY == 100) && ((tankbotX >= 125) && (tankbotX <= 750))) || (((tankbotY == 175) && (((tankbotX >= 125) && (tankbotX <= 350)) || (((tankbotX >= 525) && (tankbotX <= 750))))) || (((tankbotY == 200) || (tankbotY == 225) || (tankbotY == 275) || (tankbotY == 400) || (tankbotY == 425) || (tankbotY == 525)) && ((tankbotX >= 125) && (tankbotX <= 750)))) || ((tankbotY == 250) && ((tankbotX == 125) || (tankbotX == 150) || (tankbotX == 325) || (tankbotX == 350) || (tankbotX == 525) || (tankbotX == 550) || (tankbotX == 725) || (tankbotX == 750))) || ((tankbotY == 375) && (((tankbotX >= 125) && (tankbotX <= 300)) || ((tankbotX >= 550) && (tankbotX <= 750)) || (tankbotX == 425) || (tankbotX == 450))) || ((tankbotY == 300) && ((tankbotX == 125) || ((tankbotX >= 325) && (tankbotX <= 550)) || (tankbotX == 750))) || ((tankbotY == 325) && ((tankbotX == 125) || (tankbotX == 325) || (tankbotX == 425) || (tankbotX == 450) || (tankbotX == 550) || (tankbotX == 750))) || ((tankbotY == 350) && ((tankbotX == 125) || (tankbotX == 325) || (tankbotX == 550) || (tankbotX == 750)))) {
+                if(((tankbotY == 100) && ((tankbotX >= 125) && (tankbotX <= 750))) || (((tankbotY == 175) && (((tankbotX >= 125) && (tankbotX <= 350)) || (((tankbotX >= 525) && (tankbotX <= 750))))) || (((tankbotY == 200) || (tankbotY == 225) || (tankbotY == 275) || (tankbotY == 400) || (tankbotY == 425) || (tankbotY == 525)) && ((tankbotX >= 125) && (tankbotX <= 750)))) || ((tankbotY == 250) && ((tankbotX == 125) || (tankbotX == 150) || (tankbotX == 325) || (tankbotX == 350) || (tankbotX == 525) || (tankbotX == 550) || (tankbotX == 725) || (tankbotX == 750))) || ((tankbotY == 375) && (((tankbotX >= 125) && (tankbotX <= 325)) || ((tankbotX >= 550) && (tankbotX <= 750)) || (tankbotX == 425) || (tankbotX == 450))) || ((tankbotY == 300) && ((tankbotX == 125) || ((tankbotX >= 325) && (tankbotX <= 550)) || (tankbotX == 750))) || ((tankbotY == 325) && ((tankbotX == 125) || (tankbotX == 325) || (tankbotX == 425) || (tankbotX == 450) || (tankbotX == 550) || (tankbotX == 750))) || ((tankbotY == 350) && ((tankbotX == 125) || (tankbotX == 325) || (tankbotX == 550) || (tankbotX == 750)))) {
                     tankbotX += dX;
                 }
             }
-        }
-    }
-
-    public void updateBullets() {
-        if(isAlive){
-            botBullets.update();
         }
     }
 
@@ -107,25 +110,12 @@ public class TankBot {
         return tankbotY;
     }
 
-    public String getDirectionbot() {
-        return directionbot;
-    }
-
-    public BotBullets getBotBullets() {
-        return botBullets;
-    }
-
     public void stopBotTimer(){
         timertankbot.stop();
-        shoottankbot.stop();
-    }
-
-    public void clearBullets() {
-        botBullets.getBullets().clear();
     }
 
     public void rotate() throws IOException {
-        if((tankbotX==125) && (tankbotY==525)){
+        if((tankbotX==125) && (tankbotY==375)){
             setImagetankbotNOW("RIGHT");
             this.directionbot = "RIGHT";
         }
@@ -145,6 +135,38 @@ public class TankBot {
             setImagetankbotNOW("RIGHT");
             this.directionbot = "RIGHT";
         }
+        if((tankbotX==425) && (tankbotY==225)){
+            setImagetankbotNOW("UP");
+            this.directionbot = "UP";
+        }
+        if((tankbotX==350) && (tankbotY==375)){
+            setImagetankbotNOW("UP");
+            this.directionbot = "UP";
+        }
+        if((tankbotX==775) && (tankbotY==400)){
+            setImagetankbotNOW("UP");
+            this.directionbot = "UP";
+        }
+        if((tankbotX==425) && (tankbotY==100)){
+            setImagetankbotNOW("RIGHT");
+            this.directionbot = "RIGHT";
+        }
+        if((tankbotX==350) && (tankbotY==175)){
+            setImagetankbotNOW("LEFT");
+            this.directionbot = "LEFT";
+        }
+        if((tankbotX==775) && (tankbotY==425)){
+            setImagetankbotNOW("UP");
+            this.directionbot = "UP";
+        }
+        if((tankbotX==775) && (tankbotY==275)){
+            setImagetankbotNOW("LEFT");
+            this.directionbot = "LEFT";
+        }
+        if((tankbotX==125) && (tankbotY==175)){
+            setImagetankbotNOW("DOWN");
+            this.directionbot = "DOWN";
+        }
     }
 
     public void returnAfterHit(int tankbotX, int tankbotY, String directionbot) throws IOException {
@@ -153,5 +175,9 @@ public class TankBot {
         this.directionbot = directionbot;
         setImagetankbotNOW(directionbot);
         isAlive = true;
+    }
+
+    public void setisAlive(boolean isAlive){
+        this.isAlive = isAlive;
     }
 }
