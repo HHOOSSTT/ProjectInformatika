@@ -26,16 +26,16 @@ public class Tank {
 
     public void setimageTank(String direction) {
         if(direction.equals("UP")){
-            imagetankNOW=imageTankUP;
+            imagetankNOW = imageTankUP;
         }
         if(direction.equals("LEFT")){
-            imagetankNOW=imageTankLEFT;
+            imagetankNOW = imageTankLEFT;
         }
         if(direction.equals("DOWN")){
-            imagetankNOW=imageTankDOWN;
+            imagetankNOW = imageTankDOWN;
         }
         if(direction.equals("RIGHT")){
-            imagetankNOW=imageTankRIGHT;
+            imagetankNOW = imageTankRIGHT;
         }
     }
 
