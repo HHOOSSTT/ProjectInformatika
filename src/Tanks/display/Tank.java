@@ -24,7 +24,6 @@ public class Tank {
     public final int IS_WALL_IN_MAP = 2;
     public final int Initial_OffsetX = 4;
     public final int Initial_OffsetY = 3;
-    public final int Nearby_Cell = 1;
 
     Image imageTankUP = ImageIO.read(new File("tankUP.png"));
     Image imageTankDOWN = ImageIO.read(new File("tankDOWN.png"));
@@ -175,32 +174,28 @@ public class Tank {
     }
 
     public boolean checkNearbyCellUP(){
-        if((walls[tanky/25-Initial_OffsetY-Nearby_Cell][tankx/25-Initial_OffsetX] != IS_WALL_AROUND_MAP) && (walls[tanky/25-Initial_OffsetY-Nearby_Cell][tankx/25-Initial_OffsetX] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
+        return checkNearBy(0, -1);
     }
 
     public boolean checkNearbyCellLEFT(){
-        if((walls[tanky/25-Initial_OffsetY][tankx/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[tanky/25-Initial_OffsetY][tankx/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
+        return checkNearBy(-1, 0);
     }
 
     public boolean checkNearbyCellDOWN(){
-        if((walls[tanky/25-Initial_OffsetY+Nearby_Cell][tankx/25-Initial_OffsetX] != IS_WALL_AROUND_MAP) && (walls[tanky/25-Initial_OffsetY+Nearby_Cell][tankx/25-Initial_OffsetX] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
+        return checkNearBy(0, 1);
     }
 
     public boolean checkNearbyCellRIGHT(){
-        if((walls[tanky/25-Initial_OffsetY][tankx/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[tanky/25-Initial_OffsetY][tankx/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
+        return checkNearBy(1, 0);
     }
+
+    private boolean checkNearBy(int nearby_CellX, int nearby_CellY) {
+        int x = tankx / 25 - Initial_OffsetX;
+        int y = tanky / 25 - Initial_OffsetY;
+        return (walls[y + nearby_CellY][x + nearby_CellX] != IS_WALL_AROUND_MAP)
+                && (walls[y + nearby_CellY][x + nearby_CellX] != IS_WALL_IN_MAP);
+    }
+
 
     public void moveUp(Graphics h) {
         if(checkNearbyCellUP()){
