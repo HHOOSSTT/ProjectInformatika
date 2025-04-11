@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Map extends JPanel implements KeyListener {
 
@@ -46,8 +47,11 @@ public class Map extends JPanel implements KeyListener {
     public Bonus bonus2 = new Bonus(200, 200, ImageIO.read(new File("bonus.png")), random.nextInt(1, 3));
     private final ArrayList<Bonus> bonuses = new ArrayList<>(Arrays.asList(bonus1, bonus2));
     public final int FULL_COUNT_OF_PLAYERS_BULLETS = 5;
-    public int[][] walls = new int[21][30];
     public BufferedImage staticBackground = null;
+    File mapFile = new File("Map.txt");
+    private Scanner scanner = new Scanner(mapFile);
+    public final int IS_WALL_AROUND_MAP = 1;
+    public final int IS_WALL_IN_MAP = 2;
 
     public Map() throws IOException {
         setFocusable(true);
@@ -55,7 +59,6 @@ public class Map extends JPanel implements KeyListener {
         updatingGame();
         bulletRecovery();
         respawnBonus();
-        fillMap();
         setDoubleBuffered(true);
         createStaticBackground();
     }
@@ -101,78 +104,27 @@ public class Map extends JPanel implements KeyListener {
         bulletrecovery.start();
     }
 
-    public void fillWallsAroundMap(){
-        int IS_WALL_AROUND_MAP = 1;
-        for (int x = 0; x < 29; x++) {
-            walls[0][x] = IS_WALL_AROUND_MAP;
-        }
-        for (int y = 0; y < 20; y++) {
-            walls[y][28] = IS_WALL_AROUND_MAP;
-        }
-        for (int x = 0; x < 28; x++) {
-            walls[19][x] = IS_WALL_AROUND_MAP;
-        }
-        for (int y = 0; y < 20; y++) {
-            walls[y][0] = IS_WALL_AROUND_MAP;
+    public void fillMap(Graphics g) throws IOException {
+        int y=0;
+        while (scanner.hasNext()) {
+            String str = scanner.nextLine();
+            for (int i = 0; i < str.length(); ++i) {
+                int a = str.charAt(i) - '0';
+                if(a == IS_WALL_AROUND_MAP){
+                    g.drawImage(ImageIO.read(new File("stenkavokrug.png")), (i+1)*25+75, (y+1)*25+50, 25, 25, null);
+                }
+                if(a == IS_WALL_IN_MAP){
+                    g.drawImage(ImageIO.read(new File("stenka.png")), (i+1)*25+75, (y+1)*25+50, 25, 25, null);
+                }
+            }
+            y++;
         }
     }
 
-    public void fillWallsInMap(){
-        int IS_WALL_IN_MAP = 2;
-        for (int x = 2; x < 27; x += 2) {
-            if (x != 12 && x != 14 && x != 16) {
-                walls[2][x] = IS_WALL_IN_MAP;
-                walls[3][x] = IS_WALL_IN_MAP;
-            } else {
-                walls[2][x] = IS_WALL_IN_MAP;
-                walls[3][x] = IS_WALL_IN_MAP;
-                walls[4][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int x = 4; x < 25; x += 8) {
-            for (int i = 0; i < 5; i++) {
-                walls[7][x + i] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int y = 9; y < 12; y++) {
-            for (int x = 3; x < 9; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int x = 2; x <= 27; x += 2) {
-            walls[15][x] = IS_WALL_IN_MAP;
-            walls[16][x] = IS_WALL_IN_MAP;
-            walls[17][x] = IS_WALL_IN_MAP;
-        }
-        for (int y = 10; y < 13; y++) {
-            for (int x = 11; x < 13; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int x = 12; x < 16; x++) {
-            walls[11][x] = IS_WALL_IN_MAP;
-        }
-        for (int y = 10; y < 13; y++) {
-            for (int x = 16; x < 18; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int y = 9; y < 12; y++) {
-            for (int x = 20; x < 26; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-    }
-
-    public void fillMap() {
-        fillWallsAroundMap();
-        fillWallsInMap();
-    }
-
-    private void createStaticBackground() {
+    private void createStaticBackground() throws IOException {
         staticBackground = new BufferedImage(950, 750, BufferedImage.TYPE_INT_ARGB);
         paintLinesAndBackground(staticBackground.createGraphics());
-        paintWalls(staticBackground.createGraphics());
+        fillMap(staticBackground.createGraphics());
         staticBackground.createGraphics().dispose();
     }
 
@@ -212,28 +164,6 @@ public class Map extends JPanel implements KeyListener {
         g.drawString(s5, 670, 620);
     }
 
-    private void paintWalls(Graphics g) {
-        int IS_WALL_AROUND_MAP = 1;
-        int IS_WALL_IN_MAP = 2;
-        for (int y = 0; y < 20; y++) {
-            for (int x = 0; x < 29; x++) {
-                if (walls[y][x] == IS_WALL_AROUND_MAP) {
-                    try {
-                        g.drawImage(ImageIO.read(new File("stenkavokrug.png")), (x + 1) * 25 + 75, (y + 1) * 25 + 50, 25, 25, null);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                if (walls[y][x] == IS_WALL_IN_MAP) {
-                    try {
-                        g.drawImage(ImageIO.read(new File("stenka.png")), (x + 1) * 25 + 75, (y + 1) * 25 + 50, 25, 25, null);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        }
-    }
 
     private void paintLinesAndBackground(Graphics g) {
         g.setColor(new Color(0xD3D3D3));
