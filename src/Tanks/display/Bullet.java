@@ -11,11 +11,18 @@ public class Bullet extends JComponent implements ActionListener {
     private final Color color = Color.red;
     public String direction;
     private boolean canMove = true;
+    public int[][] walls = new int[21][30];
+    public final int IS_WALL_AROUND_MAP = 1;
+    public final int IS_WALL_IN_MAP = 2;
+    public final int Initial_OffsetX = 4;
+    public final int Initial_OffsetY = 3;
+    public final int Nearby_Cell = 1;
 
     public Bullet(int bulletX, int bulletY, String direction) {
         this.bulletX = bulletX;
         this.bulletY = bulletY;
         this.direction = direction;
+        fillMap();
     }
 
     public int getBulletX() {
@@ -37,29 +44,128 @@ public class Bullet extends JComponent implements ActionListener {
         g.fillOval(bulletX,bulletY, RADIUS_OF_BULLET, RADIUS_OF_BULLET);
     }
 
+    public void fillWallsAroundMap(){
+        int IS_WALL_AROUND_MAP = 1;
+        for (int x = 0; x < 29; x++) {
+            walls[0][x] = IS_WALL_AROUND_MAP;
+        }
+        for (int y = 0; y < 20; y++) {
+            walls[y][28] = IS_WALL_AROUND_MAP;
+        }
+        for (int x = 0; x < 28; x++) {
+            walls[19][x] = IS_WALL_AROUND_MAP;
+        }
+        for (int y = 0; y < 20; y++) {
+            walls[y][0] = IS_WALL_AROUND_MAP;
+        }
+    }
+
+    public void fillWallsInMap(){
+        int IS_WALL_IN_MAP = 2;
+        for (int x = 2; x < 27; x += 2) {
+            if (x != 12 && x != 14 && x != 16) {
+                walls[2][x] = IS_WALL_IN_MAP;
+                walls[3][x] = IS_WALL_IN_MAP;
+            } else {
+                walls[2][x] = IS_WALL_IN_MAP;
+                walls[3][x] = IS_WALL_IN_MAP;
+                walls[4][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 4; x < 25; x += 8) {
+            for (int i = 0; i < 5; i++) {
+                walls[7][x + i] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int y = 9; y < 12; y++) {
+            for (int x = 3; x < 9; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 2; x <= 27; x += 2) {
+            walls[15][x] = IS_WALL_IN_MAP;
+            walls[16][x] = IS_WALL_IN_MAP;
+            walls[17][x] = IS_WALL_IN_MAP;
+        }
+        for (int y = 10; y < 13; y++) {
+            for (int x = 11; x < 13; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 12; x < 16; x++) {
+            walls[11][x] = IS_WALL_IN_MAP;
+        }
+        for (int y = 10; y < 13; y++) {
+            for (int x = 16; x < 18; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int y = 9; y < 12; y++) {
+            for (int x = 20; x < 26; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+    }
+
+    public void fillMap() {
+        fillWallsAroundMap();
+        fillWallsInMap();
+    }
+
+    public boolean checkNearbyCellUP(){
+        return false;
+    }
+
+    public boolean checkNearbyCellLEFT(){
+        if((walls[bulletY/25-Initial_OffsetY][bulletX/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[bulletY/25-Initial_OffsetY][bulletX/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_IN_MAP)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkNearbyCellDOWN(){
+        if((walls[bulletY/25-Initial_OffsetY+Nearby_Cell][bulletX/25-Initial_OffsetX] != IS_WALL_AROUND_MAP) && (walls[bulletY/25-Initial_OffsetY+Nearby_Cell][bulletX/25-Initial_OffsetX] != IS_WALL_IN_MAP)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkNearbyCellRIGHT(){
+        if((walls[bulletY/25-Initial_OffsetY][bulletX/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[bulletY/25-Initial_OffsetY][bulletX/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_IN_MAP)){
+            return true;
+        }
+        return false;
+    }
+
     public void move() {
-        int speed = 5;
+        int speed = 4;
         if(canMove){
             if(direction.equals("UP")) {
-                bulletY -= speed;
-            }
-            if(direction.equals("DOWN")) {
-                bulletY += speed;
-            }
-            if(direction.equals("LEFT")) {
-                bulletX -= speed;
-            }
-            if(direction.equals("RIGHT")) {
-                bulletX += speed;
-            }
-            if(direction.equals("UP") || direction.equals("DOWN")) {
-                if((((bulletY<=96)||(bulletY>=541))&&((bulletX==783)||(bulletX==583)||(bulletX==333)||(bulletX==133)))||(((bulletX==158)||(bulletX==758))&&((bulletY>=442)||(bulletY<=172)))||(((bulletX==233)||(bulletX==283)||(bulletX==633)||(bulletX==683))&&((bulletY>=541)||((bulletY<=374)&&(bulletY>=299))||((bulletY<=274)&&(bulletY>=244))||(bulletY<=96)))||(((bulletX==183)||(bulletX==733))&&((bulletY>=541)||((bulletY<=374)&&(bulletY>=293))||(bulletY<=97)))||(((bulletX==358)||(bulletX==558))&&((bulletY>=442)||(bulletY<=171)))||(((bulletX==383)||(bulletX==533))&&(((bulletY>=317)&&(bulletY<=396))||(bulletY<=96)||(bulletY>=541)))||(((bulletX==433)||(bulletX==483))&&((bulletY<=96)||((bulletY<=374)&&(bulletY>=346))||((bulletY<=274)&&(bulletY>=242))||(bulletY>=541)))||((bulletX==458)&&((bulletY>=443)||((bulletY<=373)&&(bulletY>=343))||(bulletY<=273)))){
-                    canMove=false;
+                if(checkNearbyCellUP()){
+                    bulletY -=speed;
+                }else{
+                    canMove = false;
                 }
             }
-            if(direction.equals("LEFT") || direction.equals("RIGHT")) {
-                if((((bulletX<=122)||(bulletX>=792))&&((bulletY==533)||(bulletY==433)||(bulletY==408)||(bulletY==283)||(bulletY==233)||(bulletY==208)||(bulletY==108)))||((bulletY==383)&&(((bulletX<=548)&&(bulletX>=492))||((bulletX<=421)&&(bulletX>=367))||(bulletX<=122)))||((bulletY==183)&&((bulletX<=122)||((bulletX>=391)&&(bulletX<=521))||(bulletX>=792)))||((bulletY==308)&&((bulletX>=594)||(bulletX<=323)))||((bulletY==258)&&(((bulletX<=723)&&(bulletX>=592))||((bulletX<=523)&&(bulletX>=392))||((bulletX<=323)&&(bulletX>=192))||(bulletX>=792)||(bulletX<=122)))||((bulletY==333)&&((bulletX<=421)||(bulletX>=491)))){
-                    canMove=false;
+            if(direction.equals("DOWN")) {
+                if(checkNearbyCellDOWN()){
+                    bulletY +=speed;
+                }else{
+                    canMove = false;
+                }
+            }
+            if(direction.equals("LEFT")) {
+                if(checkNearbyCellLEFT()){
+                    bulletX -=speed;
+                }else{
+                    canMove = false;
+                }
+            }
+            if(direction.equals("RIGHT")) {
+                if(checkNearbyCellRIGHT()){
+                    bulletX +=speed;
+                }else{
+                    canMove = false;
                 }
             }
         }
