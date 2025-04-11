@@ -32,24 +32,25 @@ public class Bullet extends JComponent implements ActionListener {
         if(!canMove){
             return;
         }
+        int RADIUS_OF_BULLET = 10;
         g.setColor(color);
-        g.fillOval(bulletX,bulletY, 10, 10);
+        g.fillOval(bulletX,bulletY, RADIUS_OF_BULLET, RADIUS_OF_BULLET);
     }
 
     public void move() {
-        int d = 4;
+        int speed = 5;
         if(canMove){
             if(direction.equals("UP")) {
-                bulletY -= d;
+                bulletY -= speed;
             }
             if(direction.equals("DOWN")) {
-                bulletY += d;
+                bulletY += speed;
             }
             if(direction.equals("LEFT")) {
-                bulletX -= d;
+                bulletX -= speed;
             }
             if(direction.equals("RIGHT")) {
-                bulletX += d;
+                bulletX += speed;
             }
             if(direction.equals("UP") || direction.equals("DOWN")) {
                 if((((bulletY<=96)||(bulletY>=541))&&((bulletX==783)||(bulletX==583)||(bulletX==333)||(bulletX==133)))||(((bulletX==158)||(bulletX==758))&&((bulletY>=442)||(bulletY<=172)))||(((bulletX==233)||(bulletX==283)||(bulletX==633)||(bulletX==683))&&((bulletY>=541)||((bulletY<=374)&&(bulletY>=299))||((bulletY<=274)&&(bulletY>=244))||(bulletY<=96)))||(((bulletX==183)||(bulletX==733))&&((bulletY>=541)||((bulletY<=374)&&(bulletY>=293))||(bulletY<=97)))||(((bulletX==358)||(bulletX==558))&&((bulletY>=442)||(bulletY<=171)))||(((bulletX==383)||(bulletX==533))&&(((bulletY>=317)&&(bulletY<=396))||(bulletY<=96)||(bulletY>=541)))||(((bulletX==433)||(bulletX==483))&&((bulletY<=96)||((bulletY<=374)&&(bulletY>=346))||((bulletY<=274)&&(bulletY>=242))||(bulletY>=541)))||((bulletX==458)&&((bulletY>=443)||((bulletY<=373)&&(bulletY>=343))||(bulletY<=273)))){
@@ -65,7 +66,8 @@ public class Bullet extends JComponent implements ActionListener {
     }
 
     public boolean ishitTank(int bulletX, int bulletY, int tankX, int tankY) {
-        if(((bulletX>=tankX) && (bulletX<=tankX+25)) && ((bulletY<=tankY+25) && (bulletY>=tankY))){
+        int SIZE_OF_TANK = 25;
+        if(((bulletX>=tankX) && (bulletX<=tankX+SIZE_OF_TANK)) && ((bulletY<=tankY+SIZE_OF_TANK) && (bulletY>=tankY))){
             return true;
         }
         return false;

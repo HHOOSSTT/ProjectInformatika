@@ -23,7 +23,8 @@ public class Bonus extends JComponent {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         if(isVisible){
-            g.drawImage(imagebonus, bonusX, bonusY, 25, 25, null);
+            int SIZE_OF_SQUARE = 25;
+            g.drawImage(imagebonus, bonusX, bonusY, SIZE_OF_SQUARE, SIZE_OF_SQUARE, null);
         }
     }
 
