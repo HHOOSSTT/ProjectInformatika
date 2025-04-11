@@ -16,6 +16,12 @@ public class TankBot {
     private final Timer timertankbot;
     private final ArrayList<Bullet> botbullets;
     private final Timer shoottankbot;
+    public int[][] walls = new int[21][30];
+    public final int IS_WALL_AROUND_MAP = 1;
+    public final int IS_WALL_IN_MAP = 2;
+    public final int Initial_OffsetX = 4;
+    public final int Initial_OffsetY = 3;
+    public final int Nearby_Cell = 1;
 
     public void setImagetankbotNOW(String directionbot) throws IOException {
         if(directionbot.equals("UP")) {
@@ -32,6 +38,74 @@ public class TankBot {
         }
     }
 
+    public void fillWallsAroundMap(){
+        int IS_WALL_AROUND_MAP = 1;
+        for (int x = 0; x < 29; x++) {
+            walls[0][x] = IS_WALL_AROUND_MAP;
+        }
+        for (int y = 0; y < 20; y++) {
+            walls[y][28] = IS_WALL_AROUND_MAP;
+        }
+        for (int x = 0; x < 28; x++) {
+            walls[19][x] = IS_WALL_AROUND_MAP;
+        }
+        for (int y = 0; y < 20; y++) {
+            walls[y][0] = IS_WALL_AROUND_MAP;
+        }
+    }
+
+    public void fillWallsInMap(){
+        int IS_WALL_IN_MAP = 2;
+        for (int x = 2; x < 27; x += 2) {
+            if (x != 12 && x != 14 && x != 16) {
+                walls[2][x] = IS_WALL_IN_MAP;
+                walls[3][x] = IS_WALL_IN_MAP;
+            } else {
+                walls[2][x] = IS_WALL_IN_MAP;
+                walls[3][x] = IS_WALL_IN_MAP;
+                walls[4][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 4; x < 25; x += 8) {
+            for (int i = 0; i < 5; i++) {
+                walls[7][x + i] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int y = 9; y < 12; y++) {
+            for (int x = 3; x < 9; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 2; x <= 27; x += 2) {
+            walls[15][x] = IS_WALL_IN_MAP;
+            walls[16][x] = IS_WALL_IN_MAP;
+            walls[17][x] = IS_WALL_IN_MAP;
+        }
+        for (int y = 10; y < 13; y++) {
+            for (int x = 11; x < 13; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 12; x < 16; x++) {
+            walls[11][x] = IS_WALL_IN_MAP;
+        }
+        for (int y = 10; y < 13; y++) {
+            for (int x = 16; x < 18; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int y = 9; y < 12; y++) {
+            for (int x = 20; x < 26; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+    }
+
+    public void fillMap() {
+        fillWallsAroundMap();
+        fillWallsInMap();
+    }
+
     public TankBot(int tankbotX, int tankbotY, String directionbot, ArrayList<Bullet> botbullets) throws IOException {
         this.tankbotX=tankbotX;
         this.tankbotY=tankbotY;
@@ -42,10 +116,12 @@ public class TankBot {
         this.botbullets = botbullets;
         shoottankbot = new Timer(3500, e->shoot());
         shoottankbot.start();
+        fillMap();
     }
 
     public void paintComponent(Graphics g) {
-        g.drawImage(imagetankbotNOW, tankbotX, tankbotY, 25, 25, null);
+        int SIZE_OF_SQUARE = 25;
+        g.drawImage(imagetankbotNOW, tankbotX, tankbotY, SIZE_OF_SQUARE, SIZE_OF_SQUARE, null);
     }
 
     public void shoot(){
@@ -71,27 +147,55 @@ public class TankBot {
         botbullets.add(new Bullet(bulletX, bulletY, direction));
     }
 
+    public boolean checkNearbyCellUP(){
+        if((walls[tankbotY/25-Initial_OffsetY-Nearby_Cell][tankbotX/25-Initial_OffsetX] != IS_WALL_AROUND_MAP) && (walls[tankbotY/25-Initial_OffsetY-Nearby_Cell][tankbotX/25-Initial_OffsetX] != IS_WALL_IN_MAP)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkNearbyCellLEFT(){
+        if((walls[tankbotY/25-Initial_OffsetY][tankbotX/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[tankbotY/25-Initial_OffsetY][tankbotX/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_IN_MAP)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkNearbyCellDOWN(){
+        if((walls[tankbotY/25-Initial_OffsetY+Nearby_Cell][tankbotX/25-Initial_OffsetX] != IS_WALL_AROUND_MAP) && (walls[tankbotY/25-Initial_OffsetY+Nearby_Cell][tankbotX/25-Initial_OffsetX] != IS_WALL_IN_MAP)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkNearbyCellRIGHT(){
+        if((walls[tankbotY/25-Initial_OffsetY][tankbotX/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[tankbotY/25-Initial_OffsetY][tankbotX/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_IN_MAP)){
+            return true;
+        }
+        return false;
+    }
+
     public void move() {
         if(isAlive){
             int dX=25;
             int dY=25;
             if(directionbot.equals("UP")) {
-                if(((((tankbotX == 775) || (tankbotX == 125) || (tankbotX == 325) || (tankbotX == 575)) && ((tankbotY >= 125) && (tankbotY <= 525)) || (((tankbotX == 150) || (tankbotX == 350) || (tankbotX == 550) || (tankbotX == 750)) && ((tankbotY > 175) && (tankbotY <= 425))) || (((tankbotX == 175) || (tankbotX == 725)) && (((tankbotY <= 525) && (tankbotY >= 400)) || ((tankbotY >= 125) && (tankbotY <= 275)))) || (((tankbotX == 200) || (tankbotX == 250) || (tankbotX == 300) || (tankbotX == 600) || (tankbotX == 650) || (tankbotX == 700)) && (((tankbotY >= 200) && (tankbotY <= 225)) || ((tankbotY <= 475) && (tankbotY >= 400)))) || (((tankbotX == 225) || (tankbotX == 275) || (tankbotX == 625) || (tankbotX == 675)) && (((tankbotY >= 125) && (tankbotY <= 225)) || ((tankbotY <= 525) && (tankbotY >= 400)))) || (((tankbotX == 375) || (tankbotX == 525)) && (((tankbotY <= 525) && (tankbotY >= 425)) || ((tankbotY >= 125) && (tankbotY <= 300)))) || (((tankbotX == 400) || (tankbotX == 500)) && ((tankbotY == 225) || (tankbotY == 300) || (tankbotY == 425))) || (((tankbotX == 425) || (tankbotX == 475)) && ((tankbotY != 250) && (tankbotY != 275) && (tankbotY != 350) && (tankbotY != 375) && (tankbotY >= 125))) || ((tankbotX == 450) && ((tankbotY == 425) || (tankbotY == 400) || (tankbotY == 325) || (tankbotY == 300) || (tankbotY == 225)))))) {
+                if(checkNearbyCellUP()){
                     tankbotY -= dY;
                 }
             }
             if(directionbot.equals("LEFT")) {
-                if(((tankbotY == 100) && ((tankbotX >= 150) && (tankbotX <= 775))) || (((tankbotY == 175) && (((tankbotX >= 150) && (tankbotX <= 375)) || (((tankbotX >= 550) && (tankbotX <= 775))))) || (((tankbotY == 200) || (tankbotY == 225) || (tankbotY == 275) || (tankbotY == 400) || (tankbotY == 425) || (tankbotY == 525)) && ((tankbotX >= 150) && (tankbotX <= 775)))) || ((tankbotY == 250) && ((tankbotX == 150) || (tankbotX == 175) || (tankbotX == 350) || (tankbotX == 375) || (tankbotX == 550) || (tankbotX == 575) || (tankbotX == 750) || (tankbotX == 775))) || ((tankbotY == 375) && (((tankbotX >= 150) && (tankbotX <= 350)) || ((tankbotX >= 575) && (tankbotX <= 775)) || (tankbotX == 450) || (tankbotX == 475))) || ((tankbotY == 300) && ((tankbotX == 150) || ((tankbotX >= 350) && (tankbotX <= 575)) || (tankbotX == 775))) || ((tankbotY == 325) && ((tankbotX == 150) || (tankbotX == 350) || (tankbotX == 450) || (tankbotX == 475) || (tankbotX == 575) || (tankbotX == 775))) || ((tankbotY == 350) && ((tankbotX == 150) || (tankbotX == 350) || (tankbotX == 575) || (tankbotX == 775)))) {
+                if(checkNearbyCellLEFT()){
                     tankbotX -= dX;
                 }
             }
             if(directionbot.equals("DOWN")) {
-                if((((tankbotY == 100) || (tankbotY == 125) || (tankbotY == 150) || (tankbotY == 425) || (tankbotY == 450) || (tankbotY == 475) || (tankbotY == 500)) && ((tankbotX == 125) || (tankbotX == 175) || (tankbotX == 225) || (tankbotX == 275) || (tankbotX == 325) || (tankbotX == 375) || (tankbotX == 425) || (tankbotX == 475) || (tankbotX == 525) || (tankbotX == 575) || (tankbotX == 625) || (tankbotX == 675) || (tankbotX == 725) || (tankbotX == 775))) || ((tankbotY == 175) && ((tankbotX != 400) && (tankbotX != 450) && (tankbotX != 500))) || ((tankbotY == 200) || (tankbotY == 400)) || (((tankbotY == 225) || (tankbotY == 250)) && ((tankbotX == 125) || (tankbotX == 150) || (tankbotX == 175) || (tankbotX == 325) || (tankbotX == 350) || (tankbotX == 375) || (tankbotX == 525) || (tankbotX == 550) || (tankbotX == 575) || (tankbotX == 725) || (tankbotX == 750) || (tankbotX == 775))) || ((tankbotY == 275) && ((tankbotX != 175) && (tankbotX != 200) && (tankbotX != 225) && (tankbotX != 250) && (tankbotX != 275) && (tankbotX != 300) && (tankbotX != 600) && (tankbotX != 625) && (tankbotX != 650) && (tankbotX != 675) && (tankbotX != 700) && (tankbotX != 725))) || (((tankbotY == 300) && ((tankbotX == 125) || (tankbotX == 150) || (tankbotX == 325) || (tankbotX == 350) || (tankbotX == 425) || (tankbotX == 450) || (tankbotX == 475) || (tankbotX == 550) || (tankbotX == 575) || (tankbotX == 750) || (tankbotX == 775)))) || (((tankbotY == 325) || (tankbotY == 350)) && ((tankbotX == 125) || (tankbotX == 150) || (tankbotX == 325) || (tankbotX == 350) || (tankbotX == 550) || (tankbotX == 575) || (tankbotX == 750) || (tankbotX == 775))) || ((tankbotY == 375) && ((tankbotX != 375) && (tankbotX != 400) && (tankbotX != 500) && (tankbotX != 525)))) {
+                if(checkNearbyCellDOWN()){
                     tankbotY += dY;
                 }
             }
             if(directionbot.equals("RIGHT")) {
-                if(((tankbotY == 100) && ((tankbotX >= 125) && (tankbotX <= 750))) || (((tankbotY == 175) && (((tankbotX >= 125) && (tankbotX <= 350)) || (((tankbotX >= 525) && (tankbotX <= 750))))) || (((tankbotY == 200) || (tankbotY == 225) || (tankbotY == 275) || (tankbotY == 400) || (tankbotY == 425) || (tankbotY == 525)) && ((tankbotX >= 125) && (tankbotX <= 750)))) || ((tankbotY == 250) && ((tankbotX == 125) || (tankbotX == 150) || (tankbotX == 325) || (tankbotX == 350) || (tankbotX == 525) || (tankbotX == 550) || (tankbotX == 725) || (tankbotX == 750))) || ((tankbotY == 375) && (((tankbotX >= 125) && (tankbotX <= 325)) || ((tankbotX >= 550) && (tankbotX <= 750)) || (tankbotX == 425) || (tankbotX == 450))) || ((tankbotY == 300) && ((tankbotX == 125) || ((tankbotX >= 325) && (tankbotX <= 550)) || (tankbotX == 750))) || ((tankbotY == 325) && ((tankbotX == 125) || (tankbotX == 325) || (tankbotX == 425) || (tankbotX == 450) || (tankbotX == 550) || (tankbotX == 750))) || ((tankbotY == 350) && ((tankbotX == 125) || (tankbotX == 325) || (tankbotX == 550) || (tankbotX == 750)))) {
+                if(checkNearbyCellRIGHT()){
                     tankbotX += dX;
                 }
             }

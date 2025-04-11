@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,17 +38,29 @@ public class Map extends JPanel implements KeyListener {
     public int countbullets2 = 5;
     private int lifes2 = 3;
     private boolean isGame = true;
-    private final Timer game;
-    private final Timer bulletrecovery;
-    Random random = new Random();
-    public Bonus bonus1 = new Bonus(500, 400, ImageIO.read(new File("bonus.png")), random.nextInt(1, 4));
-    public Bonus bonus2 = new Bonus(200, 200, ImageIO.read(new File("bonus.png")), random.nextInt(1, 4));
-    private final ArrayList<Bonus> bonuses = new ArrayList<>(Arrays.asList(bonus1, bonus2));
+    private Timer game;
     private Timer respawnbonus;
+    private Timer bulletrecovery;
+    Random random = new Random();
+    public Bonus bonus1 = new Bonus(500, 400, ImageIO.read(new File("bonus.png")), random.nextInt(1, 3));
+    public Bonus bonus2 = new Bonus(200, 200, ImageIO.read(new File("bonus.png")), random.nextInt(1, 3));
+    private final ArrayList<Bonus> bonuses = new ArrayList<>(Arrays.asList(bonus1, bonus2));
+    public final int FULL_COUNT_OF_PLAYERS_BULLETS = 5;
+    public int[][] walls = new int[21][30];
+    public BufferedImage staticBackground = null;
 
     public Map() throws IOException {
         setFocusable(true);
         addKeyListener(this);
+        updatingGame();
+        bulletRecovery();
+        respawnBonus();
+        fillMap();
+        setDoubleBuffered(true);
+        createStaticBackground();
+    }
+
+    private void updatingGame() {
         game = new Timer(16, e -> {
             try {
                 updateGame();
@@ -57,18 +70,12 @@ public class Map extends JPanel implements KeyListener {
             repaint();
         });
         game.start();
-        bulletrecovery = new Timer(1500, e->{
-            if(countbullets1 < 5){
-                countbullets1++;
-            }
-            if(countbullets2 < 5){
-                countbullets2++;
-            }
-            repaint();
-        });
-        bulletrecovery.start();
-        for(Bonus bonus : bonuses){
-            respawnbonus = new Timer(23000, e-> {
+    }
+
+    private void respawnBonus() {
+        int TIME_RESPAWN_OF_BONUS = 23000;
+        for (Bonus bonus : bonuses) {
+            respawnbonus = new Timer(TIME_RESPAWN_OF_BONUS, e -> {
                 try {
                     bonus.respawn(bonus.getBonusX(), bonus.getBonusY(), ImageIO.read(new File("bonus.png")));
                 } catch (IOException ex) {
@@ -80,9 +87,117 @@ public class Map extends JPanel implements KeyListener {
         }
     }
 
+    private void bulletRecovery() {
+        int TIME_BULLET_RECOVERY = 1500;
+        bulletrecovery = new Timer(TIME_BULLET_RECOVERY, e -> {
+            if (countbullets1 < FULL_COUNT_OF_PLAYERS_BULLETS) {
+                countbullets1++;
+            }
+            if (countbullets2 < FULL_COUNT_OF_PLAYERS_BULLETS) {
+                countbullets2++;
+            }
+            repaint();
+        });
+        bulletrecovery.start();
+    }
+
+    public void fillWallsAroundMap(){
+        int IS_WALL_AROUND_MAP = 1;
+        for (int x = 0; x < 29; x++) {
+            walls[0][x] = IS_WALL_AROUND_MAP;
+        }
+        for (int y = 0; y < 20; y++) {
+            walls[y][28] = IS_WALL_AROUND_MAP;
+        }
+        for (int x = 0; x < 28; x++) {
+            walls[19][x] = IS_WALL_AROUND_MAP;
+        }
+        for (int y = 0; y < 20; y++) {
+            walls[y][0] = IS_WALL_AROUND_MAP;
+        }
+    }
+
+    public void fillWallsInMap(){
+        int IS_WALL_IN_MAP = 2;
+        for (int x = 2; x < 27; x += 2) {
+            if (x != 12 && x != 14 && x != 16) {
+                walls[2][x] = IS_WALL_IN_MAP;
+                walls[3][x] = IS_WALL_IN_MAP;
+            } else {
+                walls[2][x] = IS_WALL_IN_MAP;
+                walls[3][x] = IS_WALL_IN_MAP;
+                walls[4][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 4; x < 25; x += 8) {
+            for (int i = 0; i < 5; i++) {
+                walls[7][x + i] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int y = 9; y < 12; y++) {
+            for (int x = 3; x < 9; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 2; x <= 27; x += 2) {
+            walls[15][x] = IS_WALL_IN_MAP;
+            walls[16][x] = IS_WALL_IN_MAP;
+            walls[17][x] = IS_WALL_IN_MAP;
+        }
+        for (int y = 10; y < 13; y++) {
+            for (int x = 11; x < 13; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int x = 12; x < 16; x++) {
+            walls[11][x] = IS_WALL_IN_MAP;
+        }
+        for (int y = 10; y < 13; y++) {
+            for (int x = 16; x < 18; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+        for (int y = 9; y < 12; y++) {
+            for (int x = 20; x < 26; x++) {
+                walls[y][x] = IS_WALL_IN_MAP;
+            }
+        }
+    }
+
+    public void fillMap() {
+        fillWallsAroundMap();
+        fillWallsInMap();
+    }
+
+    private void createStaticBackground() {
+        staticBackground = new BufferedImage(950, 750, BufferedImage.TYPE_INT_ARGB);
+        paintLinesAndBackground(staticBackground.createGraphics());
+        paintWalls(staticBackground.createGraphics());
+        staticBackground.createGraphics().dispose();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        g.drawImage(staticBackground, 0, 0, null);
+        paintCounters(g);
+        tank1.paintComponent(g);
+        tank2.paintComponent(g);
+        for (Bullet bullet : bullets) {
+            bullet.paintComponent(g);
+        }
+        for (Bullet bullet : botbullets) {
+            bullet.paintComponent(g);
+        }
+        for (TankBot tankbot : tankBots) {
+            tankbot.paintComponent(g);
+        }
+        for (Bonus bonus : bonuses) {
+            bonus.paintComponent(g);
+        }
+    }
+
+    private void paintCounters(Graphics g) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 30));
         String s1 = "Score:" + score;
@@ -95,44 +210,32 @@ public class Map extends JPanel implements KeyListener {
         g.drawString(s4, 20, 620);
         String s5 = "Player2 bullets:" + countbullets2;
         g.drawString(s5, 670, 620);
-        Image imageStenka = null;
-        try {
-            imageStenka = ImageIO.read(new File("stenka.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        Image imageStenkavokrug = null;
-        try {
-            imageStenkavokrug = ImageIO.read(new File("stenkavokrug.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        int x = 100;
-        while (x <= 750) {
-            g.drawImage(imageStenkavokrug, x, 75, 50, 25, null);
-            x += 50;
-        }
-        g.drawImage(imageStenkavokrug, 800, 75, 25, 25, null);
+    }
 
-        int y = 100;
-        while (y <= 500) {
-            g.drawImage(imageStenkavokrug, 100, y, 25, 50, null);
-            y += 50;
+    private void paintWalls(Graphics g) {
+        int IS_WALL_AROUND_MAP = 1;
+        int IS_WALL_IN_MAP = 2;
+        for (int y = 0; y < 20; y++) {
+            for (int x = 0; x < 29; x++) {
+                if (walls[y][x] == IS_WALL_AROUND_MAP) {
+                    try {
+                        g.drawImage(ImageIO.read(new File("stenkavokrug.png")), (x + 1) * 25 + 75, (y + 1) * 25 + 50, 25, 25, null);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (walls[y][x] == IS_WALL_IN_MAP) {
+                    try {
+                        g.drawImage(ImageIO.read(new File("stenka.png")), (x + 1) * 25 + 75, (y + 1) * 25 + 50, 25, 25, null);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
         }
+    }
 
-        int w = 100;
-        while (w <= 750) {
-            g.drawImage(imageStenkavokrug, w, 550, 50, 25, null);
-            w += 50;
-        }
-        g.drawImage(imageStenkavokrug, 800, 550, 25, 25, null);
-
-        int z = 100;
-        while (z <= 500) {
-            g.drawImage(imageStenkavokrug, 800, z, 25, 50, null);
-            z += 50;
-        }
-
+    private void paintLinesAndBackground(Graphics g) {
         g.setColor(new Color(0xD3D3D3));
         g.fillRect(125, 100, 675, 450);
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -146,57 +249,16 @@ public class Map extends JPanel implements KeyListener {
             g.drawLine(j, 100, j, 550);
             ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         }
-        int a = 150;
-        int i = 1;
-        while (a <= 750) {
-            if ((i == 6) || (i == 7) || (i == 8)) {
-                g.drawImage(imageStenka, a, 125, 25, 75, null);
-                a += 50;
-            } else {
-                g.drawImage(imageStenka, a, 125, 25, 50, null);
-                a += 50;
-            }
-            i++;
-        }
-        int b = 200;
-        while (b <= 750) {
-            g.drawImage(imageStenka, b, 250, 125, 25, null);
-            b += 200;
-        }
-        g.drawImage(imageStenka, 375, 325, 50, 75, null);
-        g.drawImage(imageStenka, 425, 350, 75, 25, null);
-        g.drawImage(imageStenka, 500, 325, 50, 75, null);
-        int c = 150;
-        while (c <= 750) {
-            g.drawImage(imageStenka, c, 450, 25, 75, null);
-            c += 50;
-        }
-        g.drawImage(imageStenka, 175, 300, 150, 75, null);
-        g.drawImage(imageStenka, 600, 300, 150, 75, null);
-        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        tank1.paintComponent(g);
-        tank2.paintComponent(g);
-        for (Bullet bullet : bullets) {
-            bullet.paintComponent(g);
-        }
-        for (Bullet bullet : botbullets) {
-            bullet.paintComponent(g);
-        }
-        for (TankBot tankbot : tankBots){
-            tankbot.paintComponent(g);
-        }
-        for(Bonus bonus : bonuses){
-            bonus.paintComponent(g);
-        }
     }
 
-    public void stopGame(){
+    public void stopGame() {
         isGame = false;
         tankbot1.stopBotTimer();
         tankbot2.stopBotTimer();
         tankbot3.stopBotTimer();
         game.stop();
         bulletrecovery.stop();
+        respawnbonus.stop();
     }
 
     private void Victory() {
@@ -222,48 +284,70 @@ public class Map extends JPanel implements KeyListener {
     }
 
     private void updateGame() throws IOException {
-        if((score == 10) && (isGame)){
+        moveBullets();
+        playersVictory();
+        playersLose();
+        deathTank();
+        bulletsRemove();
+        playersHitTankbot();
+        hitPlayersTank();
+        tankbotRotate();
+        tankbotReturnAfterHit();
+        playersGetBonus();
+    }
+
+    private void playersVictory() {
+        if ((score == 10) && (isGame)) {
             Victory();
             stopGame();
         }
-        if((lifes1 <= 0) && (lifes2 <= 0)) {
+    }
+
+    private void playersLose() {
+        if ((lifes1 <= 0) && (lifes2 <= 0)) {
             Lose();
             stopGame();
         }
-        if(lifes1 == 0){
+    }
+
+    private void tankbotReturnAfterHit() throws IOException {
+        if (!tankbot1.isAlive()) {
+            tankbot1.returnAfterHit(775, 100, "LEFT");
+        }
+        if (!tankbot2.isAlive()) {
+            tankbot2.returnAfterHit(125, 200, "DOWN");
+        }
+        if (!tankbot3.isAlive()) {
+            tankbot3.returnAfterHit(350, 275, "RIGHT");
+        }
+    }
+
+    private void tankbotRotate() throws IOException {
+        for (TankBot tankBot : tankBots) {
+            tankBot.rotate();
+        }
+    }
+
+    private void deathTank() {
+        if (lifes1 == 0) {
             tank1.remove();
         }
-        if(lifes2 == 0){
+        if (lifes2 == 0) {
             tank2.remove();
         }
-        for (Bullet bullet : bullets) {
-            bullet.move();
-        }
-        bullets.removeIf(b -> !b.isCanMove());
-        botbullets.removeIf(b -> !b.isCanMove());
-        for (Bullet bullet : botbullets) {
-            bullet.move();
-        }
-        botbullets.removeIf(b -> !b.isCanMove());
-        for(TankBot tankbot : tankBots){
-            for(Bullet bullet : bullets){
-                if ((bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tankbot.getTankbotX(), tankbot.getTankbotY())) && (tankbot.isAlive())){
-                    score ++;
-                    tankbot.setisAlive(false);
-                    bullet.setcanMove(false);
-                }
-            }
-        }
-        for (TankBot tankbot : tankBots){
+    }
+
+    private void hitPlayersTank() {
+        for (TankBot tankbot : tankBots) {
             if (!tankbot.isAlive()) continue;
             for (Bullet bullet : botbullets) {
-                if ((bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank1.getTankx(), tank1.getTanky())) && (!tank1.getInvisible())){
+                if ((bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank1.getTankx(), tank1.getTanky()))) {
                     lifes1--;
                     botbullets.remove(bullet);
                     tank1.returnAfterHit1();
                     break;
                 }
-                if ((bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank2.getTankx(), tank2.getTanky())) && (!tank2.getInvisible())){
+                if ((bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank2.getTankx(), tank2.getTanky()))) {
                     lifes2--;
                     botbullets.remove(bullet);
                     tank2.returnAfterHit2();
@@ -271,83 +355,101 @@ public class Map extends JPanel implements KeyListener {
                 }
             }
         }
-        for(TankBot tankBot : tankBots){
-            tankBot.rotate();
-        }
-        if(!tankbot1.isAlive()){
-            tankbot1.returnAfterHit(775, 100, "LEFT");
-        }
-        if(!tankbot2.isAlive()){
-            tankbot2.returnAfterHit(125, 200, "DOWN");
-        }
-        if(!tankbot3.isAlive()){
-            tankbot3.returnAfterHit(350, 275, "RIGHT");
-        }
-        for(Bonus bonus : bonuses){
-            if((tank1.getTankx() == bonus.getBonusX()) &&  (tank1.getTanky() == bonus.getBonusY()) && (bonus.isVisible())){
-                if(bonus.getBonuscode() == 1){
+    }
+
+    private void playersGetBonus() {
+        for (Bonus bonus : bonuses) {
+            int BONUS_OF_LIFES = 1;
+            int BONUS_OF_BULLETS = 2;
+            if ((tank1.getTankx() == bonus.getBonusX()) && (tank1.getTanky() == bonus.getBonusY()) && (bonus.isVisible())) {
+                if (bonus.getBonuscode() == BONUS_OF_LIFES) {
                     lifes1++;
                 }
-                if(bonus.getBonuscode() == 2){
-                    countbullets1+=5;
-                }
-                if(bonus.getBonuscode() == 3){
-                    tank1.setInvisible(true);
+                if (bonus.getBonuscode() == BONUS_OF_BULLETS) {
+                    countbullets1 += FULL_COUNT_OF_PLAYERS_BULLETS;
                 }
                 bonus.setImage(null);
             }
-            if((tank2.getTankx() == bonus.getBonusX()) &&  (tank2.getTanky() == bonus.getBonusY()) && (bonus.isVisible())){
-                if(bonus.getBonuscode() == 1){
+            if ((tank2.getTankx() == bonus.getBonusX()) && (tank2.getTanky() == bonus.getBonusY()) && (bonus.isVisible())) {
+                if (bonus.getBonuscode() == BONUS_OF_LIFES) {
                     lifes2++;
                 }
-                if(bonus.getBonuscode() == 2){
-                    countbullets2+=5;
-                }
-                if(bonus.getBonuscode() == 3){
-                    tank2.setInvisible(true);
+                if (bonus.getBonuscode() == BONUS_OF_BULLETS) {
+                    countbullets2 += FULL_COUNT_OF_PLAYERS_BULLETS;
                 }
                 bonus.setImage(null);
             }
         }
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {}
-    @Override
-    public void keyPressed(KeyEvent e) {
+    private void playersHitTankbot() {
+        for (TankBot tankbot : tankBots) {
+            for (Bullet bullet : bullets) {
+                if ((bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tankbot.getTankbotX(), tankbot.getTankbotY())) && (tankbot.isAlive())) {
+                    score++;
+                    tankbot.setisAlive(false);
+                    bullet.setcanMove(false);
+                }
+            }
+        }
+    }
+
+    private void moveBullets() {
+        for (Bullet bullet : botbullets) {
+            bullet.move();
+        }
+        for (Bullet bullet : bullets) {
+            bullet.move();
+        }
+    }
+
+    private void bulletsRemove() {
+        bullets.removeIf(b -> !b.isCanMove());
+        botbullets.removeIf(b -> !b.isCanMove());
+    }
+
+    private void moveTankPlayer1(KeyEvent e) {
         int f = e.getKeyCode();
-        if ((f == KeyEvent.VK_W) && (!wPressed) && (isGame) && (lifes1 !=0)) {
+        if ((f == KeyEvent.VK_W) && (!wPressed) && (isGame) && (lifes1 != 0)) {
             tank1.moveUp(tank1.imagetankNOW.getGraphics());
             wPressed = true;
-        }
-        if ((f == KeyEvent.VK_UP) && (!upPressed) && (isGame) && (lifes2 != 0)) {
-            tank2.moveUp(tank2.imagetankNOW.getGraphics());
-            upPressed = true;
         }
         if ((f == KeyEvent.VK_A) && (!aPressed) && (isGame) && (lifes1 != 0)) {
             tank1.moveLEFT(tank1.imagetankNOW.getGraphics());
             aPressed = true;
         }
-        if ((f == KeyEvent.VK_LEFT) && (!leftPressed) && (isGame) && (lifes2 != 0)) {
-            tank2.moveLEFT(tank2.imagetankNOW.getGraphics());
-            leftPressed = true;
-        }
         if ((f == KeyEvent.VK_S) && (!sPressed) && (isGame) && (lifes1 != 0)) {
             tank1.moveDOWN(tank1.imagetankNOW.getGraphics());
             sPressed = true;
-        }
-        if ((f == KeyEvent.VK_DOWN) && (!downPressed) && (isGame) && (lifes2 != 0)) {
-            tank2.moveDOWN(tank2.imagetankNOW.getGraphics());
-            downPressed = true;
         }
         if ((f == KeyEvent.VK_D) && (!dPressed) && (isGame) && (lifes1 != 0)) {
             tank1.moveRIGHT(tank1.imagetankNOW.getGraphics());
             dPressed = true;
         }
+    }
+
+    private void moveTankPlayer2(KeyEvent e) {
+        int f = e.getKeyCode();
+        if ((f == KeyEvent.VK_UP) && (!upPressed) && (isGame) && (lifes2 != 0)) {
+            tank2.moveUp(tank2.imagetankNOW.getGraphics());
+            upPressed = true;
+        }
+        if ((f == KeyEvent.VK_LEFT) && (!leftPressed) && (isGame) && (lifes2 != 0)) {
+            tank2.moveLEFT(tank2.imagetankNOW.getGraphics());
+            leftPressed = true;
+        }
+        if ((f == KeyEvent.VK_DOWN) && (!downPressed) && (isGame) && (lifes2 != 0)) {
+            tank2.moveDOWN(tank2.imagetankNOW.getGraphics());
+            downPressed = true;
+        }
         if ((f == KeyEvent.VK_RIGHT) && (!rightPressed) && (isGame) && (lifes2 != 0)) {
             tank2.moveRIGHT(tank2.imagetankNOW.getGraphics());
             rightPressed = true;
         }
+    }
+
+    private void createBulletPlayer1(KeyEvent e) {
+        int f = e.getKeyCode();
         if ((f == KeyEvent.VK_SPACE) && (!spacePressed) && (isGame) && (lifes1 != 0)) {
             if ((tank1.getDirection().equals("UP")) && (countbullets1 > 0)) {
                 Bullet bullet = new Bullet(tank1.getTankx() + 8, tank1.getTanky() - 5, "UP");
@@ -371,6 +473,10 @@ public class Map extends JPanel implements KeyListener {
             }
             spacePressed = true;
         }
+    }
+
+    private void createBulletPlayer2(KeyEvent e) {
+        int f = e.getKeyCode();
         if ((f == KeyEvent.VK_P) && (!pPressed) && (isGame) && (lifes2 != 0)) {
             if ((tank2.getDirection().equals("UP")) && (countbullets2 > 0)) {
                 Bullet bullet = new Bullet(tank2.getTankx() + 8, tank2.getTanky() - 5, "UP");
@@ -394,8 +500,22 @@ public class Map extends JPanel implements KeyListener {
             }
             pPressed = true;
         }
+    }
+
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        moveTankPlayer1(e);
+        moveTankPlayer2(e);
+        createBulletPlayer1(e);
+        createBulletPlayer2(e);
         repaint();
     }
+
     @Override
     public void keyReleased(KeyEvent e) {
         spacePressed = false;
