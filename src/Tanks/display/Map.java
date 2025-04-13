@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,9 +50,12 @@ public class Map extends JPanel implements KeyListener {
     public final int FULL_COUNT_OF_PLAYERS_BULLETS = 5;
     public BufferedImage staticBackground = null;
     File mapFile = new File("Map.txt");
-    private Scanner scanner = new Scanner(mapFile);
     public final int IS_WALL_AROUND_MAP = 1;
     public final int IS_WALL_IN_MAP = 2;
+    public final int INITIAL_OFFSETX = 75;
+    public final int INITIAL_OFFSETY = 50;
+    public final int SIZE_OF_CELL = 25;
+    private static final int SIZE_OF_TANK = 25;
 
     public Map() throws IOException {
         setFocusable(true);
@@ -59,7 +63,6 @@ public class Map extends JPanel implements KeyListener {
         updatingGame();
         bulletRecovery();
         respawnBonus();
-        setDoubleBuffered(true);
         createStaticBackground();
     }
 
@@ -104,17 +107,20 @@ public class Map extends JPanel implements KeyListener {
         bulletrecovery.start();
     }
 
-    public void fillMap(Graphics g) throws IOException {
+    public void paintWalls(Graphics g) throws IOException {
+        Scanner scanner = new Scanner(mapFile);
         int y=0;
         while (scanner.hasNext()) {
             String str = scanner.nextLine();
             for (int i = 0; i < str.length(); ++i) {
                 int a = str.charAt(i) - '0';
                 if(a == IS_WALL_AROUND_MAP){
-                    g.drawImage(ImageIO.read(new File("stenkavokrug.png")), (i+1)*25+75, (y+1)*25+50, 25, 25, null);
+                    g.drawImage(ImageIO.read(new File("stenkavokrug.png")), (i+1)*SIZE_OF_CELL+INITIAL_OFFSETX, (y+1)*SIZE_OF_CELL+INITIAL_OFFSETY,
+                            SIZE_OF_CELL, SIZE_OF_CELL, null);
                 }
                 if(a == IS_WALL_IN_MAP){
-                    g.drawImage(ImageIO.read(new File("stenka.png")), (i+1)*25+75, (y+1)*25+50, 25, 25, null);
+                    g.drawImage(ImageIO.read(new File("stenka.png")), (i+1)*SIZE_OF_CELL+INITIAL_OFFSETX, (y+1)*SIZE_OF_CELL+INITIAL_OFFSETY,
+                            SIZE_OF_CELL, SIZE_OF_CELL, null);
                 }
             }
             y++;
@@ -122,9 +128,9 @@ public class Map extends JPanel implements KeyListener {
     }
 
     private void createStaticBackground() throws IOException {
-        staticBackground = new BufferedImage(950, 750, BufferedImage.TYPE_INT_ARGB);
+        staticBackground = new BufferedImage(950, 700, BufferedImage.TYPE_INT_ARGB);
         paintLinesAndBackground(staticBackground.createGraphics());
-        fillMap(staticBackground.createGraphics());
+        paintWalls(staticBackground.createGraphics());
         staticBackground.createGraphics().dispose();
     }
 
@@ -152,16 +158,16 @@ public class Map extends JPanel implements KeyListener {
     private void paintCounters(Graphics g) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 30));
-        String s1 = "Score:" + score;
-        g.drawString(s1, 100, 50);
-        String s2 = "Player1 lifes:" + lifes1;
-        g.drawString(s2, 320, 50);
-        String s3 = "Player2 lifes:" + lifes2;
-        g.drawString(s3, 610, 50);
-        String s4 = "Player1 bullets:" + countbullets1;
-        g.drawString(s4, 20, 620);
-        String s5 = "Player2 bullets:" + countbullets2;
-        g.drawString(s5, 670, 620);
+        String playersscore = "Score:" + score;
+        g.drawString(playersscore, 100, 50);
+        String player1lifes = "Player1 lifes:" + lifes1;
+        g.drawString(player1lifes, 320, 50);
+        String player2lifes = "Player2 lifes:" + lifes2;
+        g.drawString(player2lifes, 610, 50);
+        String players1bullets = "Player1 bullets:" + countbullets1;
+        g.drawString(players1bullets, 20, 620);
+        String player2bullets = "Player2 bullets:" + countbullets2;
+        g.drawString(player2bullets, 670, 620);
     }
 
 
@@ -274,13 +280,13 @@ public class Map extends JPanel implements KeyListener {
                 if ((bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank1.getTankx(), tank1.getTanky()))) {
                     lifes1--;
                     botbullets.remove(bullet);
-                    tank1.returnAfterHit1();
+                    tank1.returnAfterHitTank1();
                     break;
                 }
                 if ((bullet.ishitTank(bullet.getBulletX(), bullet.getBulletY(), tank2.getTankx(), tank2.getTanky()))) {
                     lifes2--;
                     botbullets.remove(bullet);
-                    tank2.returnAfterHit2();
+                    tank2.returnAfterHitTank2();
                     break;
                 }
             }
@@ -338,21 +344,57 @@ public class Map extends JPanel implements KeyListener {
         botbullets.removeIf(b -> !b.isCanMove());
     }
 
+    public boolean botisUP(Tank tank){
+        for(TankBot tankBot : tankBots){
+            if ((tank.getTankx() == tankBot.getTankbotX()) && (tank.getTanky() == tankBot.getTankbotY() + SIZE_OF_TANK) && (tankBot.isAlive())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean botisLEFT(Tank tank){;
+        for(TankBot tankBot : tankBots){
+            if ((tank.getTankx() == tankBot.getTankbotX() + SIZE_OF_TANK) && (tank.getTanky() == tankBot.getTankbotY()) && (tankBot.isAlive())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean botisDOWN(Tank tank){
+        for(TankBot tankBot : tankBots){
+            if ((tank.getTankx() == tankBot.getTankbotX()) && (tank.getTanky() == tankBot.getTankbotY() - SIZE_OF_TANK) && (tankBot.isAlive())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean botisRIGHT(Tank tank){
+        for(TankBot tankBot : tankBots){
+            if ((tank.getTankx() == tankBot.getTankbotX() - SIZE_OF_TANK) && (tank.getTanky() == tankBot.getTankbotY()) && (tankBot.isAlive())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void moveTankPlayer1(KeyEvent e) {
         int f = e.getKeyCode();
-        if ((f == KeyEvent.VK_W) && (!wPressed) && (isGame) && (lifes1 != 0)) {
+        if ((f == KeyEvent.VK_W) && (!wPressed) && (isGame) && (lifes1 != 0) &&(!botisUP(tank1))) {
             tank1.moveUp(tank1.imagetankNOW.getGraphics());
             wPressed = true;
         }
-        if ((f == KeyEvent.VK_A) && (!aPressed) && (isGame) && (lifes1 != 0)) {
+        if ((f == KeyEvent.VK_A) && (!aPressed) && (isGame) && (lifes1 != 0) && (!botisLEFT(tank1))) {
             tank1.moveLEFT(tank1.imagetankNOW.getGraphics());
             aPressed = true;
         }
-        if ((f == KeyEvent.VK_S) && (!sPressed) && (isGame) && (lifes1 != 0)) {
+        if ((f == KeyEvent.VK_S) && (!sPressed) && (isGame) && (lifes1 != 0) && (!botisDOWN(tank1))) {
             tank1.moveDOWN(tank1.imagetankNOW.getGraphics());
             sPressed = true;
         }
-        if ((f == KeyEvent.VK_D) && (!dPressed) && (isGame) && (lifes1 != 0)) {
+        if ((f == KeyEvent.VK_D) && (!dPressed) && (isGame) && (lifes1 != 0) && (!botisRIGHT(tank1))) {
             tank1.moveRIGHT(tank1.imagetankNOW.getGraphics());
             dPressed = true;
         }
@@ -360,25 +402,25 @@ public class Map extends JPanel implements KeyListener {
 
     private void moveTankPlayer2(KeyEvent e) {
         int f = e.getKeyCode();
-        if ((f == KeyEvent.VK_UP) && (!upPressed) && (isGame) && (lifes2 != 0)) {
+        if ((f == KeyEvent.VK_UP) && (!upPressed) && (isGame) && (lifes2 != 0) && (!botisUP(tank2))) {
             tank2.moveUp(tank2.imagetankNOW.getGraphics());
             upPressed = true;
         }
-        if ((f == KeyEvent.VK_LEFT) && (!leftPressed) && (isGame) && (lifes2 != 0)) {
+        if ((f == KeyEvent.VK_LEFT) && (!leftPressed) && (isGame) && (lifes2 != 0) && (!botisLEFT(tank2))) {
             tank2.moveLEFT(tank2.imagetankNOW.getGraphics());
             leftPressed = true;
         }
-        if ((f == KeyEvent.VK_DOWN) && (!downPressed) && (isGame) && (lifes2 != 0)) {
+        if ((f == KeyEvent.VK_DOWN) && (!downPressed) && (isGame) && (lifes2 != 0) && (!botisDOWN(tank2))) {
             tank2.moveDOWN(tank2.imagetankNOW.getGraphics());
             downPressed = true;
         }
-        if ((f == KeyEvent.VK_RIGHT) && (!rightPressed) && (isGame) && (lifes2 != 0)) {
+        if ((f == KeyEvent.VK_RIGHT) && (!rightPressed) && (isGame) && (lifes2 != 0) && (!botisRIGHT(tank2))) {
             tank2.moveRIGHT(tank2.imagetankNOW.getGraphics());
             rightPressed = true;
         }
     }
 
-    private void createBulletPlayer1(KeyEvent e) {
+    private void createBulletPlayer1(KeyEvent e) throws FileNotFoundException {
         int f = e.getKeyCode();
         if ((f == KeyEvent.VK_SPACE) && (!spacePressed) && (isGame) && (lifes1 != 0)) {
             if ((tank1.getDirection().equals("UP")) && (countbullets1 > 0)) {
@@ -405,7 +447,7 @@ public class Map extends JPanel implements KeyListener {
         }
     }
 
-    private void createBulletPlayer2(KeyEvent e) {
+    private void createBulletPlayer2(KeyEvent e) throws FileNotFoundException {
         int f = e.getKeyCode();
         if ((f == KeyEvent.VK_P) && (!pPressed) && (isGame) && (lifes2 != 0)) {
             if ((tank2.getDirection().equals("UP")) && (countbullets2 > 0)) {
@@ -441,8 +483,16 @@ public class Map extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
         moveTankPlayer1(e);
         moveTankPlayer2(e);
-        createBulletPlayer1(e);
-        createBulletPlayer2(e);
+        try {
+            createBulletPlayer1(e);
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+        try {
+            createBulletPlayer2(e);
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
         repaint();
     }
 
