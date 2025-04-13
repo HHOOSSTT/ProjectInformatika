@@ -4,25 +4,37 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Bullet extends JComponent implements ActionListener {
+
     public int bulletX;
     public int bulletY;
     private final Color color = Color.red;
     public String direction;
     private boolean canMove = true;
-    public int[][] walls = new int[21][30];
     public final int IS_WALL_AROUND_MAP = 1;
     public final int IS_WALL_IN_MAP = 2;
-    public final int Initial_OffsetX = 4;
-    public final int Initial_OffsetY = 3;
+    public final int Initial_OffsetX = 75;
+    public final int Initial_OffsetY = 50;
     public final int Nearby_Cell = 1;
+    public final int BULLET_SIZE = 10;
+    private ArrayList<String> mapLines = new ArrayList<>();
+    public int STARTING_ARRAY_FROM_ZERO = 1;
+    private final int SIZE_OF_CELL = 25;
+    File mapFile = new File("Map.txt");
 
-    public Bullet(int bulletX, int bulletY, String direction) {
+    public Bullet(int bulletX, int bulletY, String direction) throws FileNotFoundException {
         this.bulletX = bulletX;
         this.bulletY = bulletY;
         this.direction = direction;
-        fillMap();
+        Scanner scanner = new Scanner(mapFile);
+        while(scanner.hasNextLine()){
+            mapLines.add(scanner.nextLine());
+        }
     }
 
     public int getBulletX() {
@@ -39,134 +51,55 @@ public class Bullet extends JComponent implements ActionListener {
         if(!canMove){
             return;
         }
-        int RADIUS_OF_BULLET = 10;
         g.setColor(color);
-        g.fillOval(bulletX,bulletY, RADIUS_OF_BULLET, RADIUS_OF_BULLET);
+        g.fillOval(bulletX,bulletY, BULLET_SIZE, BULLET_SIZE);
     }
 
-    public void fillWallsAroundMap(){
-        int IS_WALL_AROUND_MAP = 1;
-        for (int x = 0; x < 29; x++) {
-            walls[0][x] = IS_WALL_AROUND_MAP;
-        }
-        for (int y = 0; y < 20; y++) {
-            walls[y][28] = IS_WALL_AROUND_MAP;
-        }
-        for (int x = 0; x < 28; x++) {
-            walls[19][x] = IS_WALL_AROUND_MAP;
-        }
-        for (int y = 0; y < 20; y++) {
-            walls[y][0] = IS_WALL_AROUND_MAP;
-        }
+    private boolean isWall(int x, int y) {
+        int cellX = (x - Initial_OffsetX) / SIZE_OF_CELL;
+        int cellY = (y - Initial_OffsetY) / SIZE_OF_CELL;
+        int cellCode = mapLines.get(cellY - STARTING_ARRAY_FROM_ZERO).charAt(cellX - STARTING_ARRAY_FROM_ZERO) - '0';
+        return (cellCode == IS_WALL_AROUND_MAP) ||  (cellCode == IS_WALL_IN_MAP);
     }
 
-    public void fillWallsInMap(){
-        int IS_WALL_IN_MAP = 2;
-        for (int x = 2; x < 27; x += 2) {
-            if (x != 12 && x != 14 && x != 16) {
-                walls[2][x] = IS_WALL_IN_MAP;
-                walls[3][x] = IS_WALL_IN_MAP;
-            } else {
-                walls[2][x] = IS_WALL_IN_MAP;
-                walls[3][x] = IS_WALL_IN_MAP;
-                walls[4][x] = IS_WALL_IN_MAP;
-            }
+    private boolean checkCollision() {
+        int HALF = 2;
+        int centerX = bulletX + BULLET_SIZE / HALF;
+        int centerY = bulletY + BULLET_SIZE / HALF;
+        if(direction.equals("UP")){
+            return isWall(centerX, bulletY - Nearby_Cell);
         }
-        for (int x = 4; x < 25; x += 8) {
-            for (int i = 0; i < 5; i++) {
-                walls[7][x + i] = IS_WALL_IN_MAP;
-            }
+        if(direction.equals("LEFT")){
+            return isWall(bulletX - Nearby_Cell, centerY);
         }
-        for (int y = 9; y < 12; y++) {
-            for (int x = 3; x < 9; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
+        if(direction.equals("DOWN")){
+            return isWall(centerX, bulletY + BULLET_SIZE + Nearby_Cell);
         }
-        for (int x = 2; x <= 27; x += 2) {
-            walls[15][x] = IS_WALL_IN_MAP;
-            walls[16][x] = IS_WALL_IN_MAP;
-            walls[17][x] = IS_WALL_IN_MAP;
+        if(direction.equals("RIGHT")){
+            return isWall(bulletX + BULLET_SIZE + Nearby_Cell, centerY);
+        }else{
+            return false;
         }
-        for (int y = 10; y < 13; y++) {
-            for (int x = 11; x < 13; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int x = 12; x < 16; x++) {
-            walls[11][x] = IS_WALL_IN_MAP;
-        }
-        for (int y = 10; y < 13; y++) {
-            for (int x = 16; x < 18; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int y = 9; y < 12; y++) {
-            for (int x = 20; x < 26; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-    }
-
-    public void fillMap() {
-        fillWallsAroundMap();
-        fillWallsInMap();
-    }
-
-    public boolean checkNearbyCellUP(){
-        return false;
-    }
-
-    public boolean checkNearbyCellLEFT(){
-        if((walls[bulletY/25-Initial_OffsetY][bulletX/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[bulletY/25-Initial_OffsetY][bulletX/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
-    }
-
-    public boolean checkNearbyCellDOWN(){
-        if((walls[bulletY/25-Initial_OffsetY+Nearby_Cell][bulletX/25-Initial_OffsetX] != IS_WALL_AROUND_MAP) && (walls[bulletY/25-Initial_OffsetY+Nearby_Cell][bulletX/25-Initial_OffsetX] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
-    }
-
-    public boolean checkNearbyCellRIGHT(){
-        if((walls[bulletY/25-Initial_OffsetY][bulletX/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[bulletY/25-Initial_OffsetY][bulletX/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
     }
 
     public void move() {
+        if((checkCollision())){
+            canMove = false;
+            return;
+        }
         int speed = 4;
-        if(canMove){
+        if((canMove) && (!checkCollision())){
             if(direction.equals("UP")) {
-                if(checkNearbyCellUP()){
-                    bulletY -=speed;
-                }else{
-                    canMove = false;
-                }
+                bulletY -= speed;
             }
             if(direction.equals("DOWN")) {
-                if(checkNearbyCellDOWN()){
-                    bulletY +=speed;
-                }else{
-                    canMove = false;
-                }
+                bulletY += speed;
             }
             if(direction.equals("LEFT")) {
-                if(checkNearbyCellLEFT()){
-                    bulletX -=speed;
-                }else{
-                    canMove = false;
-                }
+                bulletX -= speed;
             }
             if(direction.equals("RIGHT")) {
-                if(checkNearbyCellRIGHT()){
-                    bulletX +=speed;
-                }else{
-                    canMove = false;
-                }
+                bulletX += speed;
             }
         }
     }
