@@ -11,7 +11,8 @@ public class Main {
         try{
             map = new Map();
         }catch(IOException e) {
-            System.err.println("Ошибка при создании карты");
+            System.err.println("Ошибка при создании карты " + e.getMessage());
+            e.printStackTrace();
             return;
         }
         frame.add(map);
