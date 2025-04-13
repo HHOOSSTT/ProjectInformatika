@@ -4,10 +4,13 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class TankBot {
+
     private int tankbotX;
     private int tankbotY;
     private String directionbot;
@@ -16,12 +19,15 @@ public class TankBot {
     private final Timer timertankbot;
     private final ArrayList<Bullet> botbullets;
     private final Timer shoottankbot;
-    public int[][] walls = new int[21][30];
     public final int IS_WALL_AROUND_MAP = 1;
     public final int IS_WALL_IN_MAP = 2;
-    public final int Initial_OffsetX = 4;
-    public final int Initial_OffsetY = 3;
-    public final int Nearby_Cell = 1;
+    public final int Initial_OffsetX = 75;
+    public final int Initial_OffsetY = 50;
+    File mapFile = new File("Map.txt");
+    private final ArrayList<String> mapLines = new ArrayList<>();
+    public int NEARBY_CELL = 1;
+    public int STARTING_ARRAY_FROM_ZERO = 1;
+    private final int SIZE_OF_TANKBOT = 25;
 
     public void setImagetankbotNOW(String directionbot) throws IOException {
         if(directionbot.equals("UP")) {
@@ -38,74 +44,6 @@ public class TankBot {
         }
     }
 
-    public void fillWallsAroundMap(){
-        int IS_WALL_AROUND_MAP = 1;
-        for (int x = 0; x < 29; x++) {
-            walls[0][x] = IS_WALL_AROUND_MAP;
-        }
-        for (int y = 0; y < 20; y++) {
-            walls[y][28] = IS_WALL_AROUND_MAP;
-        }
-        for (int x = 0; x < 28; x++) {
-            walls[19][x] = IS_WALL_AROUND_MAP;
-        }
-        for (int y = 0; y < 20; y++) {
-            walls[y][0] = IS_WALL_AROUND_MAP;
-        }
-    }
-
-    public void fillWallsInMap(){
-        int IS_WALL_IN_MAP = 2;
-        for (int x = 2; x < 27; x += 2) {
-            if (x != 12 && x != 14 && x != 16) {
-                walls[2][x] = IS_WALL_IN_MAP;
-                walls[3][x] = IS_WALL_IN_MAP;
-            } else {
-                walls[2][x] = IS_WALL_IN_MAP;
-                walls[3][x] = IS_WALL_IN_MAP;
-                walls[4][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int x = 4; x < 25; x += 8) {
-            for (int i = 0; i < 5; i++) {
-                walls[7][x + i] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int y = 9; y < 12; y++) {
-            for (int x = 3; x < 9; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int x = 2; x <= 27; x += 2) {
-            walls[15][x] = IS_WALL_IN_MAP;
-            walls[16][x] = IS_WALL_IN_MAP;
-            walls[17][x] = IS_WALL_IN_MAP;
-        }
-        for (int y = 10; y < 13; y++) {
-            for (int x = 11; x < 13; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int x = 12; x < 16; x++) {
-            walls[11][x] = IS_WALL_IN_MAP;
-        }
-        for (int y = 10; y < 13; y++) {
-            for (int x = 16; x < 18; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-        for (int y = 9; y < 12; y++) {
-            for (int x = 20; x < 26; x++) {
-                walls[y][x] = IS_WALL_IN_MAP;
-            }
-        }
-    }
-
-    public void fillMap() {
-        fillWallsAroundMap();
-        fillWallsInMap();
-    }
-
     public TankBot(int tankbotX, int tankbotY, String directionbot, ArrayList<Bullet> botbullets) throws IOException {
         this.tankbotX=tankbotX;
         this.tankbotY=tankbotY;
@@ -114,9 +52,18 @@ public class TankBot {
         timertankbot = new Timer(2500, e -> move());
         timertankbot.start();
         this.botbullets = botbullets;
-        shoottankbot = new Timer(3500, e->shoot());
+        shoottankbot = new Timer(3500, e-> {
+            try {
+                shoot();
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         shoottankbot.start();
-        fillMap();
+        Scanner scanner = new Scanner(mapFile);
+        while(scanner.hasNextLine()){
+            mapLines.add(scanner.nextLine());
+        }
     }
 
     public void paintComponent(Graphics g) {
@@ -124,7 +71,7 @@ public class TankBot {
         g.drawImage(imagetankbotNOW, tankbotX, tankbotY, SIZE_OF_SQUARE, SIZE_OF_SQUARE, null);
     }
 
-    public void shoot(){
+    public void shoot() throws FileNotFoundException {
         int bulletX = tankbotX;
         int bulletY = tankbotY;
         String direction = directionbot;
@@ -147,32 +94,34 @@ public class TankBot {
         botbullets.add(new Bullet(bulletX, bulletY, direction));
     }
 
+    public boolean isWall(int cellX, int cellY){
+        String str = mapLines.get(cellY - STARTING_ARRAY_FROM_ZERO);
+        int cellCode = str.charAt(cellX - STARTING_ARRAY_FROM_ZERO) - '0';
+        return (cellCode == IS_WALL_AROUND_MAP) || (cellCode == IS_WALL_IN_MAP);
+    }
+
     public boolean checkNearbyCellUP(){
-        if((walls[tankbotY/25-Initial_OffsetY-Nearby_Cell][tankbotX/25-Initial_OffsetX] != IS_WALL_AROUND_MAP) && (walls[tankbotY/25-Initial_OffsetY-Nearby_Cell][tankbotX/25-Initial_OffsetX] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
+        int cellX = (tankbotX - Initial_OffsetX)/SIZE_OF_TANKBOT;
+        int cellY = (tankbotY - Initial_OffsetY)/SIZE_OF_TANKBOT - NEARBY_CELL;
+        return !isWall(cellX, cellY);
     }
 
     public boolean checkNearbyCellLEFT(){
-        if((walls[tankbotY/25-Initial_OffsetY][tankbotX/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[tankbotY/25-Initial_OffsetY][tankbotX/25-Initial_OffsetX-Nearby_Cell] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
+        int cellX = (tankbotX - Initial_OffsetX)/SIZE_OF_TANKBOT - NEARBY_CELL;
+        int cellY = (tankbotY - Initial_OffsetY)/SIZE_OF_TANKBOT;
+        return !isWall(cellX, cellY);
     }
 
     public boolean checkNearbyCellDOWN(){
-        if((walls[tankbotY/25-Initial_OffsetY+Nearby_Cell][tankbotX/25-Initial_OffsetX] != IS_WALL_AROUND_MAP) && (walls[tankbotY/25-Initial_OffsetY+Nearby_Cell][tankbotX/25-Initial_OffsetX] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
+        int cellX = (tankbotX - Initial_OffsetX)/SIZE_OF_TANKBOT;
+        int cellY = (tankbotY - Initial_OffsetY)/SIZE_OF_TANKBOT + NEARBY_CELL;
+        return !isWall(cellX, cellY);
     }
 
-    public boolean checkNearbyCellRIGHT(){
-        if((walls[tankbotY/25-Initial_OffsetY][tankbotX/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_AROUND_MAP) && (walls[tankbotY/25-Initial_OffsetY][tankbotX/25-Initial_OffsetX+Nearby_Cell] != IS_WALL_IN_MAP)){
-            return true;
-        }
-        return false;
+    public boolean checkNearbyCellRIGHT() {
+        int cellX = (tankbotX - Initial_OffsetX) / SIZE_OF_TANKBOT + NEARBY_CELL;
+        int cellY = (tankbotY - Initial_OffsetY) / SIZE_OF_TANKBOT;
+        return !isWall(cellX, cellY);
     }
 
     public void move() {
