@@ -23,6 +23,7 @@ public class Tank {
     private final ArrayList<String> mapLines = new ArrayList<>();
     public int NEARBY_CELL = 1;
     public int STARTING_ARRAY_FROM_ZERO = 1;
+    public boolean isAlive;
 
     Image imageTankUP = ImageIO.read(new File("tankUP.png"));
     Image imageTankDOWN = ImageIO.read(new File("tankDOWN.png"));
@@ -50,6 +51,7 @@ public class Tank {
         this.tanky = tanky;
         this.direction = direction;
         setimageTank(direction);
+        isAlive = true;
         Scanner scanner = new Scanner(mapFile);
         while(scanner.hasNextLine()){
             mapLines.add(scanner.nextLine());
@@ -162,5 +164,13 @@ public class Tank {
         tanky = COORDINATE_OF_TANK_OUT_OF_MAP;
         imagetankNOW = null;
         direction = "";
+    }
+
+    public void setIsAlive(boolean isAlive){
+        this.isAlive = isAlive;
+    }
+
+    public boolean getIsAlive(){
+        return this.isAlive;
     }
 }

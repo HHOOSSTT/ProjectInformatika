@@ -267,9 +267,11 @@ public class Map extends JPanel implements KeyListener {
     private void deathTank() {
         if (lifes1 == 0) {
             tank1.remove();
+            tank1.setIsAlive(false);
         }
         if (lifes2 == 0) {
             tank2.remove();
+            tank2.setIsAlive(false);
         }
     }
 
@@ -380,21 +382,49 @@ public class Map extends JPanel implements KeyListener {
         return false;
     }
 
+    public boolean playerTankisUP(Tank tank1, Tank tank2){
+        if ((tank1.getTankx() == tank2.getTankx()) && (tank1.getTanky() == tank2.getTanky() + SIZE_OF_TANK) && (tank1.getIsAlive()) && (tank2.getIsAlive())) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean playerTankisLEFT(Tank tank1, Tank tank2){;
+        if ((tank1.getTankx() == tank2.getTankx() + SIZE_OF_TANK) && (tank1.getTanky() == tank2.getTanky()) && (tank1.getIsAlive()) && (tank2.getIsAlive())) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean playerTankisDOWN(Tank tank1, Tank tank2){
+        if ((tank1.getTankx() == tank2.getTankx()) && (tank1.getTanky() == tank1.getTanky() - SIZE_OF_TANK) && (tank1.getIsAlive()) && (tank2.getIsAlive())) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean playerTankisRIGHT(Tank tank1, Tank tank2){
+        if ((tank1.getTankx() == tank2.getTankx() - SIZE_OF_TANK) && (tank1.getTanky() == tank2.getTanky()) && (tank1.getIsAlive()) && (tank2.getIsAlive())) {
+            return true;
+        }
+        return false;
+    }
+
     private void moveTankPlayer1(KeyEvent e) {
         int f = e.getKeyCode();
-        if ((f == KeyEvent.VK_W) && (!wPressed) && (isGame) && (lifes1 != 0) &&(!botisUP(tank1))) {
+        if ((f == KeyEvent.VK_W) && (!wPressed) && (isGame) && (lifes1 != 0) && (!botisUP(tank1)) && (!playerTankisUP(tank1, tank2))) {
             tank1.moveUp(tank1.imagetankNOW.getGraphics());
             wPressed = true;
         }
-        if ((f == KeyEvent.VK_A) && (!aPressed) && (isGame) && (lifes1 != 0) && (!botisLEFT(tank1))) {
+        if ((f == KeyEvent.VK_A) && (!aPressed) && (isGame) && (lifes1 != 0) && (!botisLEFT(tank1)) && (!playerTankisLEFT(tank1, tank2))) {
             tank1.moveLEFT(tank1.imagetankNOW.getGraphics());
             aPressed = true;
         }
-        if ((f == KeyEvent.VK_S) && (!sPressed) && (isGame) && (lifes1 != 0) && (!botisDOWN(tank1))) {
+        if ((f == KeyEvent.VK_S) && (!sPressed) && (isGame) && (lifes1 != 0) && (!botisDOWN(tank1)) && (!playerTankisDOWN(tank1, tank2))) {
             tank1.moveDOWN(tank1.imagetankNOW.getGraphics());
             sPressed = true;
         }
-        if ((f == KeyEvent.VK_D) && (!dPressed) && (isGame) && (lifes1 != 0) && (!botisRIGHT(tank1))) {
+        if ((f == KeyEvent.VK_D) && (!dPressed) && (isGame) && (lifes1 != 0) && (!botisRIGHT(tank1)) && (!playerTankisRIGHT(tank1, tank2))) {
             tank1.moveRIGHT(tank1.imagetankNOW.getGraphics());
             dPressed = true;
         }
@@ -402,19 +432,19 @@ public class Map extends JPanel implements KeyListener {
 
     private void moveTankPlayer2(KeyEvent e) {
         int f = e.getKeyCode();
-        if ((f == KeyEvent.VK_UP) && (!upPressed) && (isGame) && (lifes2 != 0) && (!botisUP(tank2))) {
+        if ((f == KeyEvent.VK_UP) && (!upPressed) && (isGame) && (lifes2 != 0) && (!botisUP(tank2)) && (!playerTankisUP(tank2, tank1))) {
             tank2.moveUp(tank2.imagetankNOW.getGraphics());
             upPressed = true;
         }
-        if ((f == KeyEvent.VK_LEFT) && (!leftPressed) && (isGame) && (lifes2 != 0) && (!botisLEFT(tank2))) {
+        if ((f == KeyEvent.VK_LEFT) && (!leftPressed) && (isGame) && (lifes2 != 0) && (!botisLEFT(tank2)) && (!playerTankisLEFT(tank2, tank1))) {
             tank2.moveLEFT(tank2.imagetankNOW.getGraphics());
             leftPressed = true;
         }
-        if ((f == KeyEvent.VK_DOWN) && (!downPressed) && (isGame) && (lifes2 != 0) && (!botisDOWN(tank2))) {
+        if ((f == KeyEvent.VK_DOWN) && (!downPressed) && (isGame) && (lifes2 != 0) && (!botisDOWN(tank2)) && (!playerTankisDOWN(tank2, tank1))) {
             tank2.moveDOWN(tank2.imagetankNOW.getGraphics());
             downPressed = true;
         }
-        if ((f == KeyEvent.VK_RIGHT) && (!rightPressed) && (isGame) && (lifes2 != 0) && (!botisRIGHT(tank2))) {
+        if ((f == KeyEvent.VK_RIGHT) && (!rightPressed) && (isGame) && (lifes2 != 0) && (!botisRIGHT(tank2)) && (!playerTankisRIGHT(tank2, tank1))) {
             tank2.moveRIGHT(tank2.imagetankNOW.getGraphics());
             rightPressed = true;
         }
